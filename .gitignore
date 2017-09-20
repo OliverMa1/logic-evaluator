@@ -1,0 +1,5 @@
+.idea/
+.cache-main
+model/
+target/
+*~
