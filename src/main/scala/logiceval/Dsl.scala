@@ -2,6 +2,7 @@ package logiceval
 
 import logiceval.AbstractSyntax._
 
+import scala.collection.JavaConversions
 import scala.language.implicitConversions
 
 /**
@@ -9,7 +10,7 @@ import scala.language.implicitConversions
   */
 object Dsl {
 
-  implicit def varuse(name: String): Varuse = Varuse(name)
+  implicit def varuse(name: String): VarUse = VarUse(name)
 
   def forall(vars: Variable*)(body: Expr): Expr = {
     var result = body
@@ -48,6 +49,11 @@ object Dsl {
     def ::(name: String): Variable = Variable(name, t)
 
   }
+
+  def javaMapToScala[K,V](m: java.util.Map[K,V]): Map[K,V] = {
+    JavaConversions.mapAsScalaMap(m).toMap
+  }
+
 
 
 }

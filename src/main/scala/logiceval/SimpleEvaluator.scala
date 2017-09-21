@@ -2,9 +2,10 @@ package logiceval
 
 import logiceval.AbstractSyntax._
 
+import scala.collection.JavaConversions
 import scala.collection.immutable.Seq
 
-object Evaluate {
+class SimpleEvaluator extends Evaluator {
 
   case class Context(
     structure: Structure,
@@ -20,6 +21,7 @@ object Evaluate {
     eval(expr)(context)
   }
 
+
   private def eval(expr: Expr)(implicit context: Context): Any = expr match {
     case a: App =>
       evalApp(a)
@@ -27,8 +29,16 @@ object Evaluate {
       evalQuantifierExpr(q)
     case gf: GetField =>
       evalGetFieldExpr(gf)
-    case vu: Varuse =>
+    case vu: VarUse =>
       evalVarUse(vu)
+    case ConstantUse(name) =>
+      context.structure.interpretConstant(name, Array())
+    case cd: ConstructDatatype =>
+      evalConstructDatatype(cd)
+  }
+
+  private def evalConstructDatatype(cd: ConstructDatatype): Any = {
+    ???
   }
 
   private def evalApp(app: App)(implicit context: Context): Any = {
@@ -42,7 +52,7 @@ object Evaluate {
       case Or() =>
         eval(args(0)).asInstanceOf[Boolean] || eval(args(1)).asInstanceOf[Boolean]
       case Implies() =>
-        !eval(args(0)).asInstanceOf[Boolean] || eval(args(1)).asInstanceOf[Boolean]
+        (!eval(args(0)).asInstanceOf[Boolean]) || eval(args(1)).asInstanceOf[Boolean]
       case Not() =>
         !eval(args(0)).asInstanceOf[Boolean]
       case Contains() =>
@@ -53,13 +63,15 @@ object Evaluate {
         val datatypeVal = eval(args(0)).asInstanceOf[Map[Any, Any]]
         val key = eval(args(1))
         datatypeVal.getOrElse(key, UndefinedValue())
+      case CFunc(name) =>
+        context.structure.interpretConstant(name, args.map(eval).toArray)
     }
   }
 
   private def evalQuantifierExpr(q: QuantifierExpr)(implicit context: Context): Any = {
     val v = q.variable
 
-    val values: Stream[Any] = context.structure.values(v.typ)
+    val values: Stream[Any] = JavaConversions.iterableAsScalaIterable(context.structure.values(v.typ)).toStream
 
     def evalBody(varValue: Any): Boolean = {
       val newContext = context.copy(localVars = context.localVars + (v.name -> varValue))
@@ -79,13 +91,13 @@ object Evaluate {
     datatypeValue.values.getOrElse(gf.field, () => throw new RuntimeException(s"field ${gf.field} not found"))
   }
 
-  private def evalVarUse(vu: Varuse)(implicit context: Context): Any = {
+  private def evalVarUse(vu: VarUse)(implicit context: Context): Any = {
     val varName = vu.name
     context.localVars.get(varName) match {
       case Some(value) => value
       case None =>
         // when not found in local variable assignment, it must be a constant
-        context.structure.interpretConstant(varName)
+        context.structure.interpretConstant(varName, Array())
     }
   }
 

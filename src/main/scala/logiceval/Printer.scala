@@ -9,7 +9,7 @@ import logiceval.PrettyPrintDoc._
 object Printer {
 
 
-  def printExpr(expr: Expr): Doc = expr match {
+   def printExpr(expr: Expr): Doc = expr match {
     case App(func, args) =>
       func match {
         case Equals() =>
@@ -26,11 +26,19 @@ object Printer {
           "(" <> printExpr(args(0)) <+> "∈" <+> printExpr(args(1)) <> ")"
         case Get() =>
           printExpr(args(0)) <> "[" <> printExpr(args(1)) <> "]"
+        case CFunc(name) =>
+          name <> "(" <> sep(",", args.map(printExpr)) <> ")"
       }
     case QuantifierExpr(q, v, body) =>
       "(" <> printQuantifier(q) <+> printVariable(v) <+> "." <+> printExpr(body) <> ")"
     case GetField(e, field) =>
       printExpr(e) <> "." <> field
+    case VarUse(name) =>
+      name
+    case ConstantUse(name) =>
+       name
+    case ConstructDatatype(name, values) =>
+      name <> "(" <> sep(",", values.toList.map{case (k,v) => k <+> "=" <+> printExpr(v) }) <> ")"
   }
 
   private def printQuantifier(q: Quantifier): Doc = q match {

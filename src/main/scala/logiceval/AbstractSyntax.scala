@@ -23,9 +23,11 @@ object AbstractSyntax {
 
   case class GetField(expr: Expr, field: String) extends Expr
 
-  case class Varuse(name: String) extends Expr
+  case class VarUse(name: String) extends Expr
 
-  case class ConstructDatatype(name: String, values: Map[String, Any]) extends Expr
+  case class ConstantUse(name: String) extends Expr
+
+  case class ConstructDatatype(name: String, values: Map[String, Expr]) extends Expr
 
 
   case class Variable(name: String, typ: Type)
@@ -48,6 +50,8 @@ object AbstractSyntax {
   // gets a value from a map
   case class Get() extends Func()
 
+
+  case class CFunc(name: String) extends Func()
 
   case class Construct(datatypeName: String)
 
