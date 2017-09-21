@@ -1,7 +1,6 @@
 package logiceval;
 
-import logiceval.AbstractSyntax.CustomType;
-import logiceval.AbstractSyntax.Expr;
+import logiceval.AbstractSyntax.*;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -12,16 +11,19 @@ import static logiceval.JavaDsl.*;
 import static org.junit.Assert.assertEquals;
 
 
-public class Example {
+/**
+ * This is an example showing the use of maps and a custom finite "int" type
+ */
+public class MapExample {
 
     private Evaluator evaluator = new SimpleEvaluator();
 
     private CustomType t_int = type("int");
 
-    private AbstractSyntax.ConstantUse m = constantUse("m");
-    private AbstractSyntax.VarUse x = varuse("x");
-    private AbstractSyntax.VarUse y = varuse("y");
-    private AbstractSyntax.Func lt = func("lt");
+    private App m = constantUse("m");
+    private VarUse x = varuse("x");
+    private VarUse y = varuse("y");
+    private Func lt = func("lt");
 
 
 

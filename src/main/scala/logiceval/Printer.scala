@@ -13,7 +13,7 @@ object Printer {
     case App(func, args) =>
       func match {
         case Equals() =>
-          "(" <> printExpr(args(0)) <+> "==" <+> printExpr(args(1)) <> ")"
+          "(" <> printExpr(args(0)) <+> "=" <+> printExpr(args(1)) <> ")"
         case And() =>
           "(" <> printExpr(args(0)) <+> "∧" <+> printExpr(args(1)) <> ")"
         case Or() =>
@@ -27,18 +27,24 @@ object Printer {
         case Get() =>
           printExpr(args(0)) <> "[" <> printExpr(args(1)) <> "]"
         case CFunc(name) =>
+          if (args.isEmpty) {
+            name
+          } else {
+            name <> "(" <> sep(",", args.map(printExpr)) <> ")"
+          }
+        case Construct(name) =>
           name <> "(" <> sep(",", args.map(printExpr)) <> ")"
       }
     case QuantifierExpr(q, v, body) =>
-      "(" <> printQuantifier(q) <+> printVariable(v) <+> "." <+> printExpr(body) <> ")"
+      "(" <> printQuantifier(q) <> printVariable(v) <> "." <+> printExpr(body) <> ")"
     case GetField(e, field) =>
-      printExpr(e) <> "." <> field
+      printExpr(e) <> "[" <> field.toString <> "]"
     case VarUse(name) =>
       name
-    case ConstantUse(name) =>
-       name
-    case ConstructDatatype(name, values) =>
-      name <> "(" <> sep(",", values.toList.map{case (k,v) => k <+> "=" <+> printExpr(v) }) <> ")"
+    case Undef() =>
+       "⊥"
+    case DatatypeTypecheck(e, name) =>
+       "(" <> printExpr(e) <+> "is" <+> name <> ")"
   }
 
   private def printQuantifier(q: Quantifier): Doc = q match {

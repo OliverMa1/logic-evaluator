@@ -1,9 +1,6 @@
 package logiceval;
 
-import logiceval.AbstractSyntax.CustomType;
-import logiceval.AbstractSyntax.Expr;
-import logiceval.AbstractSyntax.Func;
-import logiceval.AbstractSyntax.Variable;
+import logiceval.AbstractSyntax.*;
 import scala.collection.JavaConversions;
 import scala.collection.immutable.List;
 import scala.collection.immutable.Map;
@@ -26,7 +23,7 @@ public class JavaDsl {
     public static Expr and(Expr... es) {
         Expr result = es[0];
         for (int i = 1; i < es.length; i++) {
-            result = new AbstractSyntax.App(new AbstractSyntax.And(), list(result, es[i]));
+            result = new App(new AbstractSyntax.And(), list(result, es[i]));
         }
         return result;
     }
@@ -34,28 +31,28 @@ public class JavaDsl {
     public static Expr or(Expr... es) {
         Expr result = es[0];
         for (int i = 1; i < es.length; i++) {
-            result = new AbstractSyntax.App(new AbstractSyntax.Or(), list(result, es[i]));
+            result = new App(new AbstractSyntax.Or(), list(result, es[i]));
         }
         return result;
     }
 
     public static Expr implies(Expr left, Expr right) {
-        return new AbstractSyntax.App(new AbstractSyntax.Implies(), list(left, right));
+        return new App(new AbstractSyntax.Implies(), list(left, right));
     }
 
     public static Expr eq(Expr left, Expr right) {
-        return new AbstractSyntax.App(new AbstractSyntax.Equals(), list(left, right));
+        return new App(new AbstractSyntax.Equals(), list(left, right));
     }
 
     public static Expr not(Expr e) {
-        return new AbstractSyntax.App(new AbstractSyntax.Not(), list(e));
+        return new App(new AbstractSyntax.Not(), list(e));
     }
 
     public static Expr get(Expr mapExpr, Expr key) {
-        return new AbstractSyntax.App(new AbstractSyntax.Get(), list(mapExpr, key));
+        return new App(new AbstractSyntax.Get(), list(mapExpr, key));
     }
 
-    public static Expr read(Expr e, String field) {
+    public static Expr read(Expr e, int field) {
         return new AbstractSyntax.GetField(e, field);
     }
 
@@ -88,12 +85,12 @@ public class JavaDsl {
         return new AbstractSyntax.VarUse(varname);
     }
 
-    public static AbstractSyntax.ConstantUse constantUse(String name) {
-        return new AbstractSyntax.ConstantUse(name);
+    public static App constantUse(String name) {
+        return app(new AbstractSyntax.CFunc(name));
     }
 
-    public static Expr app(Func func, Expr... args) {
-        return new AbstractSyntax.App(func, list(args));
+    public static App app(Func func, Expr... args) {
+        return new App(func, list(args));
     }
 
     public static AbstractSyntax.CFunc func(String name) {

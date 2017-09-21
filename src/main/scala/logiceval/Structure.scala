@@ -30,8 +30,8 @@ abstract class Structure {
     case MapType(keyType, valueType) =>
       throw new RuntimeException("Map-type is not enumerable")
     case DataType(name, fields) =>
-      for (vals <- valuesList(fields.map(_._2))) yield {
-        DatatypeValue(name, fields.zip(vals).map(x => x._1._1 -> x._2).toMap)
+      for (vals <- valuesList(fields)) yield {
+        DatatypeValue(name, vals)
       }
     case ct: CustomType =>
       JavaConversions.iterableAsScalaIterable(valuesForCustomType(ct)).toStream

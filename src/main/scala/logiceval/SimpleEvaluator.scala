@@ -31,15 +31,20 @@ class SimpleEvaluator extends Evaluator {
       evalGetFieldExpr(gf)
     case vu: VarUse =>
       evalVarUse(vu)
-    case ConstantUse(name) =>
-      context.structure.interpretConstant(name, Array())
-    case cd: ConstructDatatype =>
-      evalConstructDatatype(cd)
+    case Undef() =>
+      UndefinedValue()
+    case tc: DatatypeTypecheck =>
+      evalDatatypeTypecheck(tc)
   }
 
-  private def evalConstructDatatype(cd: ConstructDatatype): Any = {
-    ???
+  private def evalDatatypeTypecheck(tc: DatatypeTypecheck)(implicit context: Context): Any = {
+    val d = eval(tc.expr)
+    d match {
+      case DatatypeValue(name, _) => name == tc.name
+      case _ => false
+    }
   }
+
 
   private def evalApp(app: App)(implicit context: Context): Any = {
     val args: Seq[Expr] = app.args
@@ -65,6 +70,8 @@ class SimpleEvaluator extends Evaluator {
         datatypeVal.getOrElse(key, UndefinedValue())
       case CFunc(name) =>
         context.structure.interpretConstant(name, args.map(eval).toArray)
+      case Construct(name) =>
+        DatatypeValue(name, args.map(eval))
     }
   }
 
@@ -88,17 +95,15 @@ class SimpleEvaluator extends Evaluator {
 
   private def evalGetFieldExpr(gf: GetField)(implicit context: Context): Any = {
     val datatypeValue: DatatypeValue = eval(gf.expr).asInstanceOf[DatatypeValue]
-    datatypeValue.values.getOrElse(gf.field, () => throw new RuntimeException(s"field ${gf.field} not found"))
+    if (gf.fieldIndex < datatypeValue.values.size) {
+      datatypeValue.values(gf.fieldIndex)
+    } else {
+      throw new RuntimeException(s"field ${gf.fieldIndex} not found for value $datatypeValue")
+    }
   }
 
   private def evalVarUse(vu: VarUse)(implicit context: Context): Any = {
-    val varName = vu.name
-    context.localVars.get(varName) match {
-      case Some(value) => value
-      case None =>
-        // when not found in local variable assignment, it must be a constant
-        context.structure.interpretConstant(varName, Array())
-    }
+    context.localVars.getOrElse(vu.name, throw new RuntimeException(s"Variable ${vu.name} not found."))
   }
 
 

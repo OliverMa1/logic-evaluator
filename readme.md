@@ -1,21 +1,13 @@
-# Requirements
+# Getting started
 
- * why3
- * z3
+The project is built with SBT.
 
-# Building
+1. Install SBT (see http://www.scala-sbt.org/download.html)
+2. Switch to the project folder and run `sbt` from commandline. 
+    This opens the SBT console.
+3. Run `compile` to compile the project.
+4. Run `test` to run the unit tests.
 
+# IDE
 
-    sbt assembly
-
-# Docker
-
-To build the Repliss docker image, run:
-    
-    docker build -t repliss .
-
-
-To run the image:
-
-    docker run --rm -p "8080:8080" -it repliss
-    
+IntelliJ IDEA with the Scala plugin can import this SBT project.
