@@ -29,9 +29,9 @@ abstract class Structure {
       throw new RuntimeException("Set-type is not enumerable")
     case MapType(keyType, valueType) =>
       throw new RuntimeException("Map-type is not enumerable")
-    case DataType(name, fields) =>
-      for (vals <- valuesList(fields)) yield {
-        DatatypeValue(name, vals)
+    case DataType(name, constructors) =>
+      for (constr <- constructors.toStream; vals <- valuesList(constr.fields)) yield {
+        DatatypeValue(constr.name, vals)
       }
     case ct: CustomType =>
       JavaConversions.iterableAsScalaIterable(valuesForCustomType(ct)).toStream

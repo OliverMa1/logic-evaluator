@@ -50,10 +50,13 @@ object Dsl {
 
   }
 
-  def javaMapToScala[K,V](m: java.util.Map[K,V]): Map[K,V] = {
+  def javaMapToScala[K, V](m: java.util.Map[K, V]): Map[K, V] = {
     JavaConversions.mapAsScalaMap(m).toMap
   }
 
+  def javaSetToScala[V](it: java.lang.Iterable[V]): Set[V] = {
+    JavaConversions.iterableAsScalaIterable(it).toSet
+  }
 
 
 }

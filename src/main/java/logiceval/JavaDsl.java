@@ -4,6 +4,7 @@ import logiceval.AbstractSyntax.*;
 import scala.collection.JavaConversions;
 import scala.collection.immutable.List;
 import scala.collection.immutable.Map;
+import scala.collection.immutable.Set;
 
 import java.util.Arrays;
 
@@ -52,10 +53,9 @@ public class JavaDsl {
         return new App(new AbstractSyntax.Get(), list(mapExpr, key));
     }
 
-    public static Expr read(Expr e, int field) {
-        return new AbstractSyntax.GetField(e, field);
+    public static Expr contains(Expr elem, Expr set) {
+        return new App(new AbstractSyntax.Contains(), list(elem, set));
     }
-
 
     public static Variable var(String name, AbstractSyntax.Type type) {
         return new Variable(name, type);
@@ -65,6 +65,26 @@ public class JavaDsl {
         return new CustomType(name);
     }
 
+    public static DataType dataType(String name, DataTypeContructor... contructors) {
+        return new DataType(name, list(contructors));
+    }
+
+    public static DataTypeContructor constructor(String name, Type... fields) {
+        return new DataTypeContructor(name, list(fields));
+    }
+
+
+    public static App construct(String name, Expr... fieldValues) {
+        return new AbstractSyntax.App(new Construct(name), list(fieldValues));
+    }
+
+    public static App pair(Expr c1, Expr c2) {
+        return construct("pair", c2, c1);
+    }
+
+    public static DatatypeValue pairValue(Object o1, Object o2) {
+        return dataTypeValue("pair", o1, o2);
+    }
 
     @SafeVarargs
     public static <T> List<T> list(T... ts) {
@@ -76,9 +96,17 @@ public class JavaDsl {
         return JavaConversions.asScalaBuffer(list).toList();
     }
 
-
     public static <A, B> Map<A, B> map(java.util.Map<A, B> m) {
         return Dsl.javaMapToScala(m);
+    }
+
+    public static <V> Set<V> set(java.lang.Iterable<V> set) {
+        return Dsl.javaSetToScala(set);
+    }
+
+    @SafeVarargs
+    public static <V> Set<V> set(V... vals) {
+        return set(Arrays.asList(vals));
     }
 
     public static AbstractSyntax.VarUse varuse(String varname) {
@@ -95,6 +123,10 @@ public class JavaDsl {
 
     public static AbstractSyntax.CFunc func(String name) {
         return new AbstractSyntax.CFunc(name);
+    }
+
+    public static DatatypeValue dataTypeValue(String name, Object... args) {
+        return new DatatypeValue(name, list(args));
     }
 
 

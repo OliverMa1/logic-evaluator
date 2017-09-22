@@ -9,21 +9,21 @@ import logiceval.PrettyPrintDoc._
 object Printer {
 
 
-   def printExpr(expr: Expr): Doc = expr match {
+  def printExpr(expr: Expr): Doc = expr match {
     case App(func, args) =>
       func match {
         case Equals() =>
-          "(" <> printExpr(args(0)) <+> "=" <+> printExpr(args(1)) <> ")"
+          binaryOperator("=", args)
         case And() =>
-          "(" <> printExpr(args(0)) <+> "∧" <+> printExpr(args(1)) <> ")"
+          binaryOperator("∧", args)
         case Or() =>
-          "(" <> printExpr(args(0)) <+> "∨" <+> printExpr(args(1)) <> ")"
+          binaryOperator("∨", args)
         case Implies() =>
-          "(" <> printExpr(args(0)) <+> "⟶" <+> printExpr(args(1)) <> ")"
+          binaryOperator("⟶", args)
         case Not() =>
           "(¬" <> printExpr(args(0)) <> ")"
         case Contains() =>
-          "(" <> printExpr(args(0)) <+> "∈" <+> printExpr(args(1)) <> ")"
+          binaryOperator("∈", args)
         case Get() =>
           printExpr(args(0)) <> "[" <> printExpr(args(1)) <> "]"
         case CFunc(name) =>
@@ -36,15 +36,26 @@ object Printer {
           name <> "(" <> sep(",", args.map(printExpr)) <> ")"
       }
     case QuantifierExpr(q, v, body) =>
-      "(" <> printQuantifier(q) <> printVariable(v) <> "." <+> printExpr(body) <> ")"
-    case GetField(e, field) =>
-      printExpr(e) <> "[" <> field.toString <> "]"
+      val bodyDoc = printExpr(body)
+      nested(4, Alternative(
+        "(" <> printQuantifier(q) <> printVariable(v) <> "." <+> bodyDoc <> ")",
+        () => "(" <> printQuantifier(q) <> printVariable(v) <> "." </> bodyDoc <> ")"
+      ))
     case VarUse(name) =>
       name
     case Undef() =>
-       "⊥"
-    case DatatypeTypecheck(e, name) =>
-       "(" <> printExpr(e) <+> "is" <+> name <> ")"
+      "⊥"
+    case ConstantValue(value) =>
+      value.toString
+  }
+
+  private def binaryOperator(op: String, args: List[Expr]): Doc = {
+    val leftDoc = printExpr(args(0))
+    val rightDoc = printExpr(args(1))
+    nested(2, Alternative(
+      "(" <> leftDoc <+> op <+> rightDoc <> ")",
+      () => "(" <> leftDoc </> op <+> rightDoc <> ")"
+    ))
   }
 
   private def printQuantifier(q: Quantifier): Doc = q match {

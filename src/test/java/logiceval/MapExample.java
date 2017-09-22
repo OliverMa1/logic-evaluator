@@ -38,7 +38,7 @@ public class MapExample {
 
         Structure structure = buildStructure(map(mBuilder));
 
-        // forall x: int :: forall y: int :: m[x] = y ==> x <= y
+        // (∀x: int. (∀y: int. ((m[x] = y) ⟶ lt(x,y))))
         Expr expr = forall(var("x", t_int),
                 forall(var("y", t_int),
                         implies(
@@ -48,7 +48,7 @@ public class MapExample {
         System.out.println(expr);
 
         Object res = evaluator.eval(expr, structure);
-        assertEquals(res, false);
+        assertEquals(false, res);
     }
 
 
@@ -63,7 +63,7 @@ public class MapExample {
 
         Structure structure = buildStructure(map(mBuilder));
 
-        // forall x: int :: forall y: int :: m[x] = y ==> x <= y
+        // (∀x: int. (∀y: int. ((m[x] = y) ⟶ lt(x,y))))
         Expr expr = forall(var("x", t_int),
                 forall(var("y", t_int),
                         implies(
@@ -74,7 +74,7 @@ public class MapExample {
         System.out.println(expr);
 
         Object res = evaluator.eval(expr, structure);
-        assertEquals(res, true);
+        assertEquals(true, res);
     }
 
     private Structure buildStructure(Map<Integer, Integer> m) {

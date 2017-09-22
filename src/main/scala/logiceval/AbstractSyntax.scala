@@ -29,11 +29,8 @@ object AbstractSyntax {
   /** Use of a bound variable  */
   case class VarUse(name: String) extends Expr
 
-  /** Get the value of a field from a datatype-value. */
-  case class GetField(expr: Expr, fieldIndex: Int) extends Expr
-
-  /** returns true, if expr is a datatype with the given name */
-  case class DatatypeTypecheck(expr: Expr, name: String) extends Expr
+  /** A constant value expression */
+  case class ConstantValue(value: Any) extends Expr
 
   sealed abstract class Quantifier
 
@@ -79,7 +76,10 @@ object AbstractSyntax {
 
   case class MapType(keyType: Type, valueType: Type) extends Type
 
-  case class DataType(name: String, fields: Seq[Type]) extends Type
+  case class DataType(name: String, constructors: Seq[DataTypeContructor]) extends Type
+
+  case class DataTypeContructor(name: String, fields: Seq[Type])
+
 
   case class CustomType(name: String) extends Type
 
@@ -90,7 +90,15 @@ object AbstractSyntax {
 
   case class SimpleValue(value: Any) extends Value
 
-  case class DatatypeValue(name: String, values: Seq[Any]) extends Value
+  case class DatatypeValue(name: String, values: Seq[Any]) extends Value {
+    override def toString: String = {
+      if (values.isEmpty) {
+        name
+      } else {
+        s"$name(${values.mkString(", ")}"
+      }
+    }
+  }
 
   case class UndefinedValue() extends Value
 

@@ -27,22 +27,12 @@ class SimpleEvaluator extends Evaluator {
       evalApp(a)
     case q: QuantifierExpr =>
       evalQuantifierExpr(q)
-    case gf: GetField =>
-      evalGetFieldExpr(gf)
     case vu: VarUse =>
       evalVarUse(vu)
     case Undef() =>
       UndefinedValue()
-    case tc: DatatypeTypecheck =>
-      evalDatatypeTypecheck(tc)
-  }
-
-  private def evalDatatypeTypecheck(tc: DatatypeTypecheck)(implicit context: Context): Any = {
-    val d = eval(tc.expr)
-    d match {
-      case DatatypeValue(name, _) => name == tc.name
-      case _ => false
-    }
+    case ConstantValue(c) =>
+      c
   }
 
 
@@ -93,14 +83,6 @@ class SimpleEvaluator extends Evaluator {
     }
   }
 
-  private def evalGetFieldExpr(gf: GetField)(implicit context: Context): Any = {
-    val datatypeValue: DatatypeValue = eval(gf.expr).asInstanceOf[DatatypeValue]
-    if (gf.fieldIndex < datatypeValue.values.size) {
-      datatypeValue.values(gf.fieldIndex)
-    } else {
-      throw new RuntimeException(s"field ${gf.fieldIndex} not found for value $datatypeValue")
-    }
-  }
 
   private def evalVarUse(vu: VarUse)(implicit context: Context): Any = {
     context.localVars.getOrElse(vu.name, throw new RuntimeException(s"Variable ${vu.name} not found."))
