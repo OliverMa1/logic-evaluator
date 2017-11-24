@@ -1,5 +1,9 @@
 package logiceval;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -126,8 +130,19 @@ public class SimpleEvaluatorJava implements Evaluator {
         for (String s : context.getLocalVars().keySet()) {
             String s1 = s;
             // TODO deep or shallow
-            Object o1 = context.getLocalVars().get(s);
-            newContext.getLocalVars().put(s1,o1);
+           // Object o1 = context.getLocalVars().get(s);
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(context.getLocalVars().get(s));
+                oos.flush();
+                oos.close();
+                bos.close();
+                byte[] byteData = bos.toByteArray();
+                ByteArrayInputStream bais = new ByteArrayInputStream(byteData);
+                Object o1 = (Object) new ObjectInputStream(bais).readObject();
+                newContext.getLocalVars().put(s1,o1);
+            } catch (Exception e) { e.printStackTrace();}
         }
         return newContext;
     }
