@@ -1,15 +1,14 @@
 package logiceval
 
-import logiceval.AbstractSyntax._
 import logiceval.PrettyPrintDoc._
 
 /**
   * Prints '''expressions'''
   */
 object Printer {
+//TODO
 
-
-  def printExpr(expr: Expr): Doc = expr match {
+  def printExpr(expr: Expr): Doc = null /*expr match {
     case App(func, args) =>
       func match {
         case Equals() =>
@@ -47,6 +46,7 @@ object Printer {
       "⊥"
     case ConstantValue(value) =>
       value.toString
+
   }
 
   private def binaryOperator(op: String, args: List[Expr]): Doc = {
@@ -76,5 +76,5 @@ object Printer {
     case CustomType(name) =>
       name
   }
-
+*/
 }

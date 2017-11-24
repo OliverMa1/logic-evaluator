@@ -1,7 +1,5 @@
 package logiceval
 
-import logiceval.AbstractSyntax._
-
 trait Signature {
 
   def loookupType(name: String): Type

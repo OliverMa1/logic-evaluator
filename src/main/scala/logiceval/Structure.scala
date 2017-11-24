@@ -1,14 +1,12 @@
 package logiceval
 
-import logiceval.AbstractSyntax._
-
 import scala.collection.JavaConversions
 
 /**
   * Structure for evaluating queries
   */
 abstract class Structure {
-
+// TODO
   /**
     * returns all values for the given type
     */
@@ -24,7 +22,7 @@ abstract class Structure {
   def values(typ: Type): java.lang.Iterable[Any] =
     JavaConversions.asJavaIterable(valuesStream(typ))
 
-  def valuesStream(typ: Type): Stream[Any] = typ match {
+  def valuesStream(typ: Type): Stream[Any] = null/*typ match {
     case SetType(elementType) =>
       throw new RuntimeException("Set-type is not enumerable")
     case MapType(keyType, valueType) =>
@@ -35,7 +33,7 @@ abstract class Structure {
       }
     case ct: CustomType =>
       JavaConversions.iterableAsScalaIterable(valuesForCustomType(ct)).toStream
-  }
+  }*/
 
   def valuesList(list: Seq[Type]): Stream[List[Any]] = list match {
     case Nil =>

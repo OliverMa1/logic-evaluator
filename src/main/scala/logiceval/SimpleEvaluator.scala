@@ -1,7 +1,5 @@
 package logiceval
 
-import logiceval.AbstractSyntax._
-
 import scala.collection.JavaConversions
 import scala.collection.immutable.Seq
 
@@ -18,10 +16,10 @@ class SimpleEvaluator extends Evaluator {
       structure = structure,
       localVars = Map()
     )
-    eval(expr)(context)
+    //eval(expr)(context)
   }
 
-
+/*
   private def eval(expr: Expr)(implicit context: Context): Any = expr match {
     case a: App =>
       evalApp(a)
@@ -87,6 +85,6 @@ class SimpleEvaluator extends Evaluator {
   private def evalVarUse(vu: VarUse)(implicit context: Context): Any = {
     context.localVars.getOrElse(vu.name, throw new RuntimeException(s"Variable ${vu.name} not found."))
   }
-
+*/
 
 }

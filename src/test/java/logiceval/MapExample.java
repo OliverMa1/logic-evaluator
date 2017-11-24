@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MapExample {
 
-    private Evaluator evaluator = new SimpleEvaluator();
+  /*  private Evaluator evaluator = new SimpleEvaluator();
 
     private CustomType t_int = type("int");
 
@@ -102,5 +102,5 @@ public class MapExample {
 
         };
     }
-
+*/
 }

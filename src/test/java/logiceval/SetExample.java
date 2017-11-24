@@ -1,9 +1,6 @@
 package logiceval;
 
-import logiceval.AbstractSyntax.App;
-import logiceval.AbstractSyntax.CustomType;
-import logiceval.AbstractSyntax.Expr;
-import logiceval.AbstractSyntax.VarUse;
+
 import org.junit.Test;
 import scala.collection.immutable.Set;
 
@@ -17,7 +14,7 @@ import static org.junit.Assert.assertEquals;
  * This is an example showing the use of sets and a custom finite "int" type
  */
 public class SetExample {
-
+/*
     private Evaluator evaluator = new SimpleEvaluator();
 
     private CustomType t_int = type("int");
@@ -92,5 +89,5 @@ public class SetExample {
 
         };
     }
-
+*/
 }

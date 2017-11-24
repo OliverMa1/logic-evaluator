@@ -1,7 +1,5 @@
 package logiceval
 
-import logiceval.AbstractSyntax._
-
 import scala.collection.JavaConversions
 import scala.language.implicitConversions
 
@@ -9,7 +7,7 @@ import scala.language.implicitConversions
   * Embedded domain specific language (DSL) for constructing formulas.
   */
 object Dsl {
-
+/*
   implicit def varuse(name: String): VarUse = VarUse(name)
 
   def forall(vars: Variable*)(body: Expr): Expr = {
@@ -58,5 +56,5 @@ object Dsl {
     JavaConversions.iterableAsScalaIterable(it).toSet
   }
 
-
+*/
 }

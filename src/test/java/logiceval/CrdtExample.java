@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class CrdtExample {
 
-    private Evaluator evaluator = new SimpleEvaluator();
+   /* private Evaluator evaluator = new SimpleEvaluator();
 
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
@@ -101,14 +101,14 @@ public class CrdtExample {
         Object res = evaluator.eval(expr, structure);
         assertEquals(true, res);
     }
-
+*/
 
     /**
      * Delete-wins semantics for map:
      * An entry exists in the map, if there is a write operation such that all delete-operations
      * were executed before the write
      */
-    private Expr mapExistsQuery() {
+  /*  private Expr mapExistsQuery() {
         Expr c1 = varuse("c1");
         Expr c2 = varuse("c2");
         Expr f = varuse("f");
@@ -178,5 +178,5 @@ public class CrdtExample {
 
         };
     }
-
+*/
 }

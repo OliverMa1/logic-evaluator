@@ -1,6 +1,5 @@
 package logiceval;
 
-import logiceval.AbstractSyntax.*;
 import scala.collection.JavaConversions;
 import scala.collection.immutable.List;
 import scala.collection.immutable.Map;
@@ -12,7 +11,7 @@ import java.util.Arrays;
  * Helper methods for building expressions (useful for test-cases)
  */
 public class JavaDsl {
-
+/*
     public static Expr forall(Variable v, Expr body) {
         return new AbstractSyntax.QuantifierExpr(new AbstractSyntax.Forall(), v, body);
     }
@@ -127,7 +126,7 @@ public class JavaDsl {
 
     public static DatatypeValue dataTypeValue(String name, Object... args) {
         return new DatatypeValue(name, list(args));
-    }
+    }*/
 
 
 }
