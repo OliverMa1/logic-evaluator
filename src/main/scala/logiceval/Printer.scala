@@ -7,8 +7,8 @@ import logiceval.PrettyPrintDoc._
   */
 object Printer {
 //TODO
-
-  def printExpr(expr: Expr): Doc = null /*expr match {
+/*
+  def printExpr(expr: Expr): Doc = null expr match {
     case App(func, args) =>
       func match {
         case Equals() =>

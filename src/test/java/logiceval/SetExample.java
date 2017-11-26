@@ -2,8 +2,11 @@ package logiceval;
 
 
 import org.junit.Test;
-import scala.collection.immutable.Set;
 
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static logiceval.JavaDsl.*;
@@ -14,8 +17,8 @@ import static org.junit.Assert.assertEquals;
  * This is an example showing the use of sets and a custom finite "int" type
  */
 public class SetExample {
-/*
-    private Evaluator evaluator = new SimpleEvaluator();
+
+    private Evaluator evaluator = new SimpleEvaluatorJava();
 
     private CustomType t_int = type("int");
 
@@ -27,8 +30,8 @@ public class SetExample {
 
     @Test
     public void test1() {
-        Set<Integer> set1 = set(1, 5, 18, 32, 77, 99);
-        Set<Integer> set2 = set(4, 7, 22, 23, 32, 88);
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
         Structure structure = buildStructure(set1, set2);
 
         // (∃x: int. (∃y: int. (((x ∈ setA) ∧ (y ∈ setB)) ∧ (x = y))))
@@ -46,8 +49,8 @@ public class SetExample {
 
     @Test
     public void test2() {
-        Set<Integer> set1 = set(1, 5, 18, 32, 77, 99);
-        Set<Integer> set2 = set(4, 7, 22, 23, 33, 88);
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
         Structure structure = buildStructure(set1, set2);
 
         // (∃x: int. (∃y: int. (((x ∈ setA) ∧ (y ∈ setB)) ∧ (x = y))))
@@ -89,5 +92,5 @@ public class SetExample {
 
         };
     }
-*/
+
 }

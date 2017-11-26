@@ -15,9 +15,8 @@ import java.util.stream.StreamSupport;
 public class SimpleEvaluatorJava implements Evaluator {
     @Override
     public Object eval(Expr expr, Structure structure) {
-        final Context context = new Context(structure, new HashMap<String,Object>());
-        eval(expr, context);
-        throw new RuntimeException("TODO implement " + expr);
+        final Context context = new Context(structure, new HashMap<String,Object>()); // problem context jedes mal neu :(
+        return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
         if (expr instanceof QuantifierExpr) {
@@ -39,35 +38,36 @@ public class SimpleEvaluatorJava implements Evaluator {
         else throw new RuntimeException("Missing cases");
     }
 
+
     private Object evalApp(App a, Context context) {
         Func f = a.getFunc();
         List<Expr> args = a.getArgs();
         if (f instanceof Equals) {
-            return eval(args.get(0), context.getStructure()) == eval(args.get(1), context.getStructure());
+            return eval(args.get(0), context) == eval(args.get(1), context);
         }
         else if (f instanceof And) {
-            return (Boolean) eval(args.get(0), context.getStructure())
-                    && (Boolean) eval(args.get(1), context.getStructure());
+            return (Boolean) eval(args.get(0), context)
+                    && (Boolean) eval(args.get(1), context);
         }
         else if (f instanceof Or) {
-            return (Boolean) eval(args.get(0), context.getStructure())
-                    ||(Boolean) eval(args.get(1), context.getStructure());
+            return (Boolean) eval(args.get(0), context)
+                    ||(Boolean) eval(args.get(1), context);
         }
         else if (f instanceof Implies) {
-            return (!(Boolean) eval(args.get(0), context.getStructure()))
-                    || ((Boolean) eval(args.get(1), context.getStructure()));
+            return (!(Boolean) eval(args.get(0), context))
+                    || ((Boolean) eval(args.get(1), context));
         }
         else if (f instanceof Not) {
-            return (!(Boolean) eval(args.get(0), context.getStructure()));
+            return (!(Boolean) eval(args.get(0), context));
         }
         else if (f instanceof Contains) {
-            Object v = eval(args.get(0), context.getStructure());
-            Set<Object> set = (Set<Object>) eval(args.get(1), context.getStructure());
+            Object v = eval(args.get(0), context);
+            Set<Object> set = (Set<Object>) eval(args.get(1), context);
             return set.contains(v);
         }
         else if (f instanceof Get) {
-            Map<Object,Object> datatypeVal =  (Map<Object,Object>)eval(args.get(0), context.getStructure());
-            Object key = eval(args.get(1),context.getStructure());
+            Map<Object,Object> datatypeVal =  (Map<Object,Object>)eval(args.get(0), context);
+            Object key = eval(args.get(1),context);
             Object r = datatypeVal.get(key);
             if (r.equals(null)) {
                 return new UndefinedValue();
@@ -76,20 +76,19 @@ public class SimpleEvaluatorJava implements Evaluator {
         else if (f instanceof CFunc) {
             List<Object> args2 = new ArrayList<Object>();
             for (Expr x : args) {
-                args2.add(eval(x,context.getStructure()));
+                args2.add(eval(x, context));
             }
             return context.getStructure().interpretConstant(((CFunc) f).getName(), args2.toArray());
         }
         else if (f instanceof Construct) {
             List<Object> args2 = new ArrayList<Object>();
             for (Expr x : args) {
-                args2.add(eval(x,context.getStructure()));
+                args2.add(eval(x,context));
             }
             return new DatatypeValue((((Construct) f).getDatatypeName()), args2);
         }
         else {
-            System.out.println("Fall vergessen");
-            return null;
+            throw new RuntimeException("Missing cases");
         }
     }
     private Object evalQuantifierExpr(QuantifierExpr qe, Context context) {
@@ -119,7 +118,7 @@ public class SimpleEvaluatorJava implements Evaluator {
 
     private Object evalVarUse(VarUse vu, Context context){
         Object a = context.getLocalVars().get(vu.getName());
-        if (a.equals(null)) {
+        if (a == (null)) {
             throw new RuntimeException("Variable ${vu.name} not found.");
         }
         else return a;
@@ -130,8 +129,9 @@ public class SimpleEvaluatorJava implements Evaluator {
         for (String s : context.getLocalVars().keySet()) {
             String s1 = s;
             // TODO deep or shallow
-           // Object o1 = context.getLocalVars().get(s);
-            try {
+            Object o1 = context.getLocalVars().get(s);
+            newContext.getLocalVars().put(s1,o1);
+           /* try {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(bos);
                 oos.writeObject(context.getLocalVars().get(s));
@@ -142,7 +142,7 @@ public class SimpleEvaluatorJava implements Evaluator {
                 ByteArrayInputStream bais = new ByteArrayInputStream(byteData);
                 Object o1 = (Object) new ObjectInputStream(bais).readObject();
                 newContext.getLocalVars().put(s1,o1);
-            } catch (Exception e) { e.printStackTrace();}
+            } catch (Exception e) { e.printStackTrace();}*/
         }
         return newContext;
     }

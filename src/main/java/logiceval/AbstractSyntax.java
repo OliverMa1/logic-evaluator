@@ -50,7 +50,7 @@ class App extends Expr {
     }
 }
 
-class QuantifierExpr extends Expr{
+class QuantifierExpr extends Expr {
     private Quantifier quantifier;
     private Variable variable;
     private Expr body;
@@ -164,29 +164,29 @@ class MapType extends Type {
 
 class DataTypeConstructor {
     private String name;
-    private List<Type> fields;
-    public DataTypeConstructor(String name, List<Type> fields) {
+    private Iterable<Type> fields;
+    public DataTypeConstructor(String name, Iterable<Type> fields) {
         this.name = name;
         this.fields = fields;
     }
     public String getName() {
         return name;
     }
-    public List<Type> getFields() {
+    public Iterable<Type> getFields() {
         return fields;
     }
 }
 class DataType extends Type {
     private String name;
-    private List<DataTypeConstructor> constructors;
-    public DataType(String name, List<DataTypeConstructor> constructors) {
+    private Iterable<DataTypeConstructor> constructors;
+    public DataType(String name, Iterable<DataTypeConstructor> constructors) {
         this.name = name;
         this.constructors = constructors;
     }
     public String getName() {
         return name;
     }
-    public List<DataTypeConstructor> getConstructors() {
+    public Iterable<DataTypeConstructor> getConstructors() {
         return constructors;
     }
 }
@@ -228,20 +228,20 @@ class SimpleValue extends Value {
 }
 class DatatypeValue extends Value {
     private String name;
-    private List<Object> values;
-    public DatatypeValue(String name, List<Object> values) {
+    private Iterable<?> values;
+    public DatatypeValue(String name, Iterable<?> values) {
         this.name = name;
         this.values = values;
     }
     public String getName() {
         return name;
     }
-    public List<Object> getValues() {
+    public Iterable<?> getValues() {
         return values;
     }
     public String toString() {
         String ausgabe = "";
-        Iterator<Object> iterator = values.iterator();
+        Iterator<?> iterator = values.iterator();
         while(iterator.hasNext()){
             ausgabe += iterator.next().toString() +", ";
         }

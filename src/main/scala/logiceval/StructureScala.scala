@@ -5,7 +5,7 @@ import scala.collection.JavaConversions
 /**
   * Structure for evaluating queries
   */
-abstract class Structure {
+abstract class StructureScala {
 // TODO
   /**
     * returns all values for the given type
