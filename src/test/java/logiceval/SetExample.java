@@ -60,10 +60,31 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-        System.out.println(expr);
 
         Object res = evaluator.eval(expr, structure);
         assertEquals(false, res);
+        System.out.println(((QuantifierExpr) expr).getVariable().getName());
+        System.out.println(expr);
+        System.out.println(expr instanceof QuantifierExpr);
+        expr = ((QuantifierExpr)expr).getBody();
+        System.out.println(((QuantifierExpr) expr).getVariable().getName());
+       // System.out.println(((QuantifierExpr)expr).getBody() instanceof App);
+        expr = ((QuantifierExpr)expr).getBody();
+        System.out.println(((App)expr).getFunc() instanceof And);
+
+        App a = (App)expr;
+        Func func = a.getFunc();
+        System.out.println(a.getArgs().get(0) instanceof App);
+        System.out.println(a.getArgs().get(1) instanceof App);
+        App c = (App)a.getArgs().get(0);
+        App d = (App)a.getArgs().get(1);
+        System.out.println(c.getFunc().getClass());
+        System.out.println(d.getFunc().getClass());
+        App e = (App) c.getArgs().get(0);
+        App f = (App) c.getArgs().get(1);
+        System.out.println(e.getFunc().getClass());
+        System.out.println(f.getFunc().getClass());
+
     }
 
 

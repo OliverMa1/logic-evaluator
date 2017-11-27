@@ -13,8 +13,9 @@ public class AbstractSyntax {
 
 }
 abstract class Expr {
+
     public String toString(){
-        return ""; // TODO : implement Printer
+        return PrintExpr.printExpr(this); // TODO : implement Printer
     }
 }
 
