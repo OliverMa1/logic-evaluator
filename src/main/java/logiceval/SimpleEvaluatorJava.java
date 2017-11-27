@@ -19,10 +19,8 @@ public class SimpleEvaluatorJava implements Evaluator {
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
-        System.out.println(context.getLocalVars().toString());
         if (expr instanceof QuantifierExpr) {
             QuantifierExpr qe = (QuantifierExpr) expr;
-            //System.out.println(qe.getBody().toString());
             return evalQuantifierExpr(qe, context);
         }
         else if (expr instanceof VarUse) {
@@ -32,7 +30,7 @@ public class SimpleEvaluatorJava implements Evaluator {
             return new UndefinedValue();
         }
         else if (expr instanceof ConstantValue) {
-            return (ConstantValue) ((ConstantValue) expr).getValue();
+            return ((ConstantValue) expr).getValue();
         }
         else if (expr instanceof App) {
             return evalApp((App) expr, context);
@@ -45,7 +43,7 @@ public class SimpleEvaluatorJava implements Evaluator {
         Func f = a.getFunc();
         List<Expr> args = a.getArgs();
         if (f instanceof Equals) {
-            return eval(args.get(0), context) == eval(args.get(1), context);
+            return eval(args.get(0), context).equals(eval(args.get(1), context));
         }
         else if (f instanceof And) {
             return (Boolean) eval(args.get(0), context)
@@ -63,10 +61,8 @@ public class SimpleEvaluatorJava implements Evaluator {
             return (!(Boolean) eval(args.get(0), context));
         }
         else if (f instanceof Contains) {
-            System.out.println("???");
             Object v = eval(args.get(0), context);
             Set<Object> set = (Set<Object>) eval(args.get(1), context);
-            System.out.println(v.toString()+ " " + set.toString());
             return set.contains(v);
         }
         else if (f instanceof Get) {
@@ -82,7 +78,8 @@ public class SimpleEvaluatorJava implements Evaluator {
             for (Expr x : args) {
                 args2.add(eval(x, context));
             }
-            return context.getStructure().interpretConstant(((CFunc) f).getName(), args2.toArray());
+            Object ase = context.getStructure().interpretConstant(((CFunc) f).getName(), args2.toArray());
+            return ase;
         }
         else if (f instanceof Construct) {
             List<Object> args2 = new ArrayList<Object>();
@@ -97,16 +94,11 @@ public class SimpleEvaluatorJava implements Evaluator {
     }
     private Object evalQuantifierExpr(QuantifierExpr qe, Context context) {
         Variable v = qe.getVariable();
-        //Stream<Object> values = StreamSupport.stream(context.getStructure().values(v.getType()).spliterator(), false);
-        //System.out.println(qe.getBody().getClass() + v.getName());
         if (qe.getQuantifier() instanceof Exists) {
             // TODO check, probleme mit CRDT
             for (Object value : context.getStructure().values(v.getType())) {
-                System.out.println("loop entered");
-                //System.out.println(value.toString());
                 if (evalBody(value,qe, context, v)) return true;
             }
-            //System.out.println("hier");
             return false;
         }
         else {
@@ -119,17 +111,10 @@ public class SimpleEvaluatorJava implements Evaluator {
     }
 
     private Boolean evalBody(Object varValue, QuantifierExpr q, Context context, Variable v) {
-        /*System.out.println("Variable :" + v.getName());
-        System.out.println("Body :" + q.getBody().toString());
-        System.out.println("old Context: " + context.getLocalVars().toString());*/
         Context newContext = copy(context, context.getStructure());
-       // System.out.println("copy Context: " + newContext.getLocalVars().toString());
         newContext.getLocalVars().put(v.getName(),varValue);
-      //  System.out.println("new Context: " + newContext.getLocalVars().toString());*/
-        System.out.println(q.getBody().getClass());
         Boolean b = (Boolean)eval(q.getBody(), newContext);
-       // System.out.println("Erg :" + b);
-        return b;//(Boolean)eval(q.getBody(),newContext);
+        return b;
     }
 
     private Object evalVarUse(VarUse vu, Context context){

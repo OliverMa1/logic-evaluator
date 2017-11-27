@@ -246,7 +246,14 @@ class DatatypeValue extends Value {
         while(iterator.hasNext()){
             ausgabe += iterator.next().toString() +", ";
         }
+        if (ausgabe.length() <= 1) {
+            return name;
+        }
         return ausgabe.substring(0,ausgabe.length()-2);
+    }
+    @Override
+    public boolean equals (Object o) {
+        return toString().equals(o.toString());
     }
 }
 
