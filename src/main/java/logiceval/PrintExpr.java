@@ -51,7 +51,7 @@ public class PrintExpr {
         }
         else if (func instanceof CFunc) {
             if (app.getArgs().size() == 0) {
-                return "(" + ((CFunc) func).getName() + ")";
+                return ((CFunc) func).getName();
             }
             else {
                 s += "(" +((CFunc) func).getName() + "(";

@@ -4,9 +4,10 @@ import logiceval.AbstractSyntax.*;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.IntStream;
 
-import scala.collection.immutable.Map;
+//import scala.collection.immutable.Map;
 import static logiceval.JavaDsl.*;
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MapExample {
 
-  /*  private Evaluator evaluator = new SimpleEvaluator();
+    private Evaluator evaluator = new SimpleEvaluatorJava();
 
     private CustomType t_int = type("int");
 
@@ -36,7 +37,7 @@ public class MapExample {
         mBuilder.put(3, 7);
         mBuilder.put(4, 1);
 
-        Structure structure = buildStructure(map(mBuilder));
+        Structure structure = buildStructure((mBuilder));
 
         // (∀x: int. (∀y: int. ((m[x] = y) ⟶ lt(x,y))))
         Expr expr = forall(var("x", t_int),
@@ -61,7 +62,7 @@ public class MapExample {
         mBuilder.put(4, 7);
         mBuilder.put(8, 8);
 
-        Structure structure = buildStructure(map(mBuilder));
+        Structure structure = buildStructure((mBuilder));
 
         // (∀x: int. (∀y: int. ((m[x] = y) ⟶ lt(x,y))))
         Expr expr = forall(var("x", t_int),
@@ -102,5 +103,5 @@ public class MapExample {
 
         };
     }
-*/
+
 }
