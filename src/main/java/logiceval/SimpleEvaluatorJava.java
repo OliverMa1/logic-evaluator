@@ -95,7 +95,6 @@ public class SimpleEvaluatorJava implements Evaluator {
     private Object evalQuantifierExpr(QuantifierExpr qe, Context context) {
         Variable v = qe.getVariable();
         if (qe.getQuantifier() instanceof Exists) {
-            // TODO check, probleme mit CRDT
             for (Object value : context.getStructure().values(v.getType())) {
                 if (evalBody(value,qe, context, v)) return true;
             }

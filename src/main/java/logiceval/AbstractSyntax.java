@@ -15,7 +15,7 @@ public class AbstractSyntax {
 abstract class Expr {
 
     public String toString(){
-        return PrintExpr.printExpr(this); // TODO : implement Printer
+        return PrintExpr.printExpr(this);
     }
 }
 
@@ -246,6 +246,7 @@ class DatatypeValue extends Value {
         while(iterator.hasNext()){
             ausgabe += iterator.next().toString() +", ";
         }
+        //TODO was machen wenn kein iterable übergeben wurde
         if (ausgabe.length() <= 1) {
             return name;
         }

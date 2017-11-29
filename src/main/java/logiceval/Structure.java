@@ -6,7 +6,7 @@ import java.util.Iterator;
 /**
  * Created by Oliver on 23.11.2017.
  */
-//TODO
+
 public abstract class Structure {
     public abstract Iterable<Object> valuesForCustomType(CustomType type);
 
@@ -30,6 +30,7 @@ public abstract class Structure {
                 }
             }
             if (arrayList.isEmpty()) {
+                //TODO was machen wenn fields leer ist
                 for (DataTypeConstructor d: ((DataType) typ).getConstructors()) {
                     arrayList.add(d.getName());
                 }
