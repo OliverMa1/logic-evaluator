@@ -83,6 +83,28 @@ public class CrdtExample {
     }
 
     @Test
+    public void test4() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
+        callOps.put(3, dataTypeValue("mapDelete", "User2"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        for (Object o : structure.values(t_callInfo)) {
+            System.out.println(o.toString());
+        }
+
+    }
+    @Test
     public void test3() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
