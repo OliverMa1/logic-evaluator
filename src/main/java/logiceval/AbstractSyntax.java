@@ -165,15 +165,15 @@ class MapType extends Type {
 
 class DataTypeConstructor {
     private String name;
-    private Iterable<Type> fields;
-    public DataTypeConstructor(String name, Iterable<Type> fields) {
+    private List<Type> fields;
+    public DataTypeConstructor(String name, List<Type> fields) {
         this.name = name;
         this.fields = fields;
     }
     public String getName() {
         return name;
     }
-    public Iterable<Type> getFields() {
+    public List<Type> getFields() {
         return fields;
     }
 }
@@ -241,7 +241,9 @@ class DatatypeValue extends Value {
         return values;
     }
     public String toString() {
-        String ausgabe = "";
+        // TODO name gewünscht?
+        String ausgabe = name +", ";
+        //String ausgabe = "";
         Iterator<?> iterator = values.iterator();
         while(iterator.hasNext()){
             ausgabe += iterator.next().toString() +", ";

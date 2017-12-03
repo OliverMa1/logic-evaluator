@@ -4,7 +4,9 @@ import logiceval.AbstractSyntax.*;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 //import scala.collection.immutable.Map;
@@ -82,10 +84,10 @@ public class MapExample {
         return new Structure() {
 
             @Override
-            public Iterable<Object> valuesForCustomType(CustomType typ) {
+            public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return () -> IntStream.range(1, 2000).mapToObj(x -> (Object) x).iterator();
+                    return  IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }

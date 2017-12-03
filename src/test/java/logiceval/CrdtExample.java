@@ -26,6 +26,8 @@ public class CrdtExample {
             constructor("F_name"),
             constructor("F_mail")
     );
+    private DataType t_pair = dataType("pair", constructor("pair", t_callId, t_callId));
+    private DataType t_UserPair = dataType("pair", constructor("pair", t_userId, t_userId));
     private DataType t_callInfo = dataType("callInfo",
             constructor("mapWrite", t_userId, t_userRecordField, t_String),
             constructor("mapDelete", t_userId)
@@ -35,6 +37,8 @@ public class CrdtExample {
     private App c_op = constantUse("op");
     private App c_happensBefore = constantUse("happensBefore");
     private App c_user = constantUse("user");
+    private VarUse x = varuse("x");
+    private VarUse p = varuse("p");
 
 
     @Test
@@ -83,7 +87,7 @@ public class CrdtExample {
     }
 
     @Test
-    public void test4() {
+    public void dataTypeTest() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
         visibleCalls.add(2);
@@ -102,6 +106,15 @@ public class CrdtExample {
         for (Object o : structure.values(t_callInfo)) {
             System.out.println(o.toString());
         }
+        System.out.println("\n Print ende \n");
+        expr = forall(var("x", t_userId),
+                exists(var("p", t_UserPair),
+                        eq(p, pair(x,x))));
+        Object res = evaluator.eval(expr, structure);
+        for (Object o : structure.values(t_UserPair)) {
+            System.out.println(o.toString());
+        }
+        assertEquals(true, res);
 
     }
     @Test
@@ -173,12 +186,12 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private Iterable<Object> strings = IntStream.range(1, 1000).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private Iterable<Object> callIds = IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private Iterable<Object> users = IntStream.range(1, 1000).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 5).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 10).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 5).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
-            public Iterable<Object> valuesForCustomType(CustomType typ) {
+            public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_String)) {
                     return strings;
                 } else if (typ.equals(t_callId)) {

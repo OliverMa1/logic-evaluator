@@ -84,8 +84,10 @@ public class SimpleEvaluatorJava implements Evaluator {
         else if (f instanceof Construct) {
             List<Object> args2 = new ArrayList<Object>();
             for (Expr x : args) {
-                args2.add(eval(x,context));
+                // TODO pair[User1,User2] usw. ist nicht gewollt
+                args2.add(eval(x, context));
             }
+            System.out.println(new DatatypeValue((((Construct) f).getDatatypeName()), args2).toString());
             return new DatatypeValue((((Construct) f).getDatatypeName()), args2);
         }
         else {

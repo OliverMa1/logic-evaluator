@@ -6,7 +6,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static logiceval.JavaDsl.*;
@@ -21,11 +23,12 @@ public class SetExample {
     private Evaluator evaluator = new SimpleEvaluatorJava();
 
     private CustomType t_int = type("int");
-
+    private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));
     private App setA = constantUse("setA");
     private App setB = constantUse("setB");
     private VarUse x = varuse("x");
     private VarUse y = varuse("y");
+    private VarUse p = varuse("p");
 
 
     @Test
@@ -42,7 +45,6 @@ public class SetExample {
                                 eq(x, y))));
 
         System.out.println(expr);
-
         Object res = evaluator.eval(expr, structure);
         assertEquals(true, res);
     }
@@ -71,10 +73,10 @@ public class SetExample {
         return new Structure() {
 
             @Override
-            public Iterable<Object> valuesForCustomType(CustomType typ) {
+            public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return () -> IntStream.range(1, 2000).mapToObj(x -> (Object) x).iterator();
+                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }
