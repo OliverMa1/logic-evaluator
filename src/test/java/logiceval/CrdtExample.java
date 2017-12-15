@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class CrdtExample {
 
     private Evaluator evaluator = new SimpleEvaluatorJava();
-
+    private Evaluator evaluator2 = new SimpleEvaluatorJava2();
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
     private CustomType t_callId = type("callId");
@@ -42,7 +42,7 @@ public class CrdtExample {
 
 
     @Test
-    public void test1() {
+    public void test1Simple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
         visibleCalls.add(2);
@@ -65,7 +65,30 @@ public class CrdtExample {
     }
 
     @Test
-    public void test2() {
+    public void test1() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String42"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String12"));
+        callOps.put(3, dataTypeValue("mapDelete", "User1"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(1,2));
+        happensBefore.add(pairValue(2,3));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        System.out.println(expr);
+
+        Object res = evaluator2.eval(expr, structure);
+        assertEquals(false, res);
+    }
+
+    @Test
+    public void test2Simple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
         visibleCalls.add(2);
@@ -85,7 +108,59 @@ public class CrdtExample {
         Object res = evaluator.eval(expr, structure);
         assertEquals(false, res);
     }
+    @Test
+    public void test2() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String42"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String12"));
+        callOps.put(3, dataTypeValue("mapDelete", "User1"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
+        Expr expr = mapExistsQuery();
+        System.out.println(expr);
+
+        Object res = evaluator2.eval(expr, structure);
+        assertEquals(false, res);
+    }
+
+    @Test
+    public void dataTypeTestSimple() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
+        callOps.put(3, dataTypeValue("mapDelete", "User2"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        System.out.println("\n Print ende \n");
+        expr = forall(var("x", t_userId),
+                exists(var("p", t_UserPair),
+                        eq(p, pair(x,x))));
+        Object res = evaluator.eval(expr, structure);
+        /*for (Object o : structure.values(t_callInfo)) {
+            System.out.println(o.toString());
+        }
+        for (Object o : structure.values(t_UserPair)) {
+            System.out.println(o.toString());
+        }*/
+        assertEquals(true, res);
+
+    }
     @Test
     public void dataTypeTest() {
         Set<Integer> visibleCalls = new HashSet<>();
@@ -103,20 +178,46 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        for (Object o : structure.values(t_callInfo)) {
-            System.out.println(o.toString());
-        }
         System.out.println("\n Print ende \n");
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
-        Object res = evaluator.eval(expr, structure);
-        for (Object o : structure.values(t_UserPair)) {
+        Object res = evaluator2.eval(expr, structure);
+       /* for (Object o : structure.values(t_UserPair)) {
             System.out.println(o.toString());
         }
+        for (Object o : structure.values(t_callInfo)) {
+            System.out.println(o.toString());
+        }*/
         assertEquals(true, res);
 
     }
+    @Test
+    public void test3Simple() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
+        callOps.put(3, dataTypeValue("mapDelete", "User2"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        /*        pairValue(2, 3),
+                pairValue(3, 1)
+        );*/
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        System.out.println(expr);
+        Object res = evaluator.eval(expr, structure);
+        assertEquals(true, res);
+
+    }
+
     @Test
     public void test3() {
         Set<Integer> visibleCalls = new HashSet<>();
@@ -138,7 +239,7 @@ public class CrdtExample {
 
         Expr expr = mapExistsQuery();
         System.out.println(expr);
-        Object res = evaluator.eval(expr, structure);
+        Object res = evaluator2.eval(expr, structure);
         assertEquals(true, res);
 
     }
@@ -186,9 +287,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 5).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 10).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 5).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 5000).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 5000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 5000).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {
