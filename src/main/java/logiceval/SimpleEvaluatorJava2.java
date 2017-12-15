@@ -12,10 +12,11 @@ import java.util.stream.StreamSupport;
  * Created by Oliver on 21.11.2017.
  */
 // TODO
-public class SimpleEvaluatorJava implements Evaluator {
+public class SimpleEvaluatorJava2 implements Evaluator {
     @Override
     public Object eval(Expr expr, Structure structure) {
-        final Context context = new Context(structure, new HashMap<String,Object>()); // problem context jedes mal neu :(
+        final Context context = new Context(structure, new HashMap<String,Object>());
+        preProcessing(expr, structure);
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -147,6 +148,66 @@ public class SimpleEvaluatorJava implements Evaluator {
             } catch (Exception e) { e.printStackTrace();}*/
         }
         return newContext;
+    }
+
+    private void preProcessing(Expr expr, Structure structure) {
+         Set<Variable> variables = new HashSet<>();
+         Set<App> containsExpr = new HashSet<>();
+         Expr preProcExpr = expr;
+         while (preProcExpr instanceof QuantifierExpr) {
+             variables.add(((QuantifierExpr) preProcExpr).getVariable());
+             preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
+         }
+        fillContainsMap(preProcExpr, containsExpr);
+        preProcExpr = expr;
+        while (preProcExpr instanceof QuantifierExpr) {
+            for(App expr1 : containsExpr) {
+                List<Expr> args = expr1.getArgs();
+                VarUse varUse = (VarUse) args.get(0);
+                Variable variable =(((QuantifierExpr) preProcExpr).getVariable());
+                if (variable.getName().equals(varUse.getName())) {
+                    //((QuantifierExpr) preProcExpr).getVariable()
+                    //System.out.println(((QuantifierExpr) preProcExpr).getVariable().getName());
+                    SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(expr1.getArgs().get(1).toString(),null ));
+                    variable.setTyp(setTypeIterable);
+                }
+            }
+            preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
+        }
+
+    }
+
+    private void fillContainsMap(Expr expr, Set<App> containsExpr) {
+
+        if (expr instanceof VarUse) {
+
+        }
+        else if (expr instanceof Undef) {
+
+        }
+        else if (expr instanceof ConstantValue) {
+
+        }
+        else if (expr instanceof App) {
+            if (((App) expr).getFunc() instanceof Contains) {
+                containsExpr.add((App)expr);
+            }
+            else if (((App) expr).getFunc() instanceof Get) {
+
+            }
+            else if (((App) expr).getFunc() instanceof CFunc) {
+
+            }
+            else if (((App) expr).getFunc() instanceof Construct) {
+
+            }
+            else {
+                for (Expr e : ((App) expr).getArgs()) {
+                    fillContainsMap(e, containsExpr);
+                }
+            }
+        }
+        else throw new RuntimeException("Missing cases");
     }
 }
 

@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class SetExample {
 
-    private Evaluator evaluator = new SimpleEvaluatorJava();
-
+    private Evaluator evaluator = new SimpleEvaluatorJava2();
+    private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private CustomType t_int = type("int");
     private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));
     private App setA = constantUse("setA");
@@ -62,8 +62,44 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-
+        System.out.println(expr);
         Object res = evaluator.eval(expr, structure);
+        assertEquals(false, res);
+
+    }
+    @Test
+    public void test1Simple() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
+
+        // (∃x: int. (∃y: int. (((x ∈ setA) ∧ (y ∈ setB)) ∧ (x = y))))
+        Expr expr = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(contains(x, setA),
+                                contains(y, setB),
+                                eq(x, y))));
+
+        System.out.println(expr);
+        Object res = evaluatorSimple.eval(expr, structure);
+        assertEquals(true, res);
+    }
+
+    @Test
+    public void test2Simple() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
+        Structure structure = buildStructure(set1, set2);
+
+        // (∃x: int. (∃y: int. (((x ∈ setA) ∧ (y ∈ setB)) ∧ (x = y))))
+        Expr expr = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(contains(x, setA),
+                                contains(y, setB),
+                                eq(x, y))));
+
+        System.out.println(expr);
+        Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
 
     }
@@ -76,7 +112,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }

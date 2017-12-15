@@ -33,6 +33,9 @@ public abstract class Structure {
         else if (typ instanceof CustomType) {
             return valuesForCustomType((CustomType)typ);
         }
+        else if (typ instanceof SetTypeIterable) {
+            return new ArrayList<Object>(((SetTypeIterable) typ).getObjectSet());
+        }
         else {
             throw new RuntimeException("Fall vergessen");
         }

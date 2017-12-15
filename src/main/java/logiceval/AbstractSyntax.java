@@ -3,6 +3,7 @@ package logiceval;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -21,6 +22,11 @@ abstract class Expr {
 
 class Variable {
     private String name;
+
+    public void setTyp(Type typ) {
+        this.typ = typ;
+    }
+
     private Type typ;
     public Variable(String name, Type typ){
         this.name = name;
@@ -32,6 +38,7 @@ class Variable {
     public Type getType() {
         return typ;
     }
+    public String toString() { return name;}
 }
 
 class App extends Expr {
@@ -147,6 +154,17 @@ class SetType extends Type {
         return elementType;
     }
 }
+
+class SetTypeIterable extends Type {
+    private Set<Object> objectSet;
+    public SetTypeIterable(Set<Object> objectSet) {
+        this.objectSet = objectSet;
+    }
+    public Set<Object> getObjectSet() {
+        return objectSet;
+    }
+}
+
 
 class MapType extends Type {
     private Type keyType;
