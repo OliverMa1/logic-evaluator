@@ -19,6 +19,7 @@ public class CrdtExample {
 
     private Evaluator evaluator = new SimpleEvaluatorJava();
     private Evaluator evaluator2 = new SimpleEvaluatorJava2();
+    private Evaluator evaluator3 = new SimpleEvaluatorJava3();
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
     private CustomType t_callId = type("callId");
@@ -83,7 +84,7 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         System.out.println(expr);
 
-        Object res = evaluator2.eval(expr, structure);
+        Object res = evaluator3.eval(expr, structure);
         assertEquals(false, res);
     }
 
@@ -287,9 +288,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 5000).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 5000).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 5000).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 500).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 500).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 500).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {

@@ -18,6 +18,7 @@ abstract class Expr {
     public String toString(){
         return PrintExpr.printExpr(this);
     }
+    public abstract void acceptEval(final ExprVisitor visitor);
 }
 
 class Variable {
@@ -56,6 +57,9 @@ class App extends Expr {
         a.addAll(args);
         return a;
     }
+    public void acceptEval(final ExprVisitor visitor){
+        visitor.visit(this);
+    }
 }
 
 class QuantifierExpr extends Expr {
@@ -76,10 +80,16 @@ class QuantifierExpr extends Expr {
     public Expr getBody() {
         return body;
     }
-
+    public void acceptEval(final ExprVisitor visitor){
+         visitor.visit(this);
+    }
 }
 
-class Undef extends Expr{}
+class Undef extends Expr{
+    public void acceptEval(final ExprVisitor visitor){
+        visitor.visit(this);
+    }
+}
 
 class VarUse extends Expr {
     private String name;
@@ -88,6 +98,9 @@ class VarUse extends Expr {
     }
     public String getName() {
         return name;
+    }
+    public void acceptEval(final ExprVisitor visitor){
+        visitor.visit(this);
     }
 }
 
@@ -99,6 +112,9 @@ class ConstantValue extends Expr {
     public Object getValue() {
         return value;
     }
+    public void acceptEval(final ExprVisitor visitor){
+        visitor.visit(this);
+    }
 }
 
 abstract class Quantifier {}
@@ -107,21 +123,51 @@ class Exists extends Quantifier {}
 
 class Forall extends Quantifier {}
 
-abstract class Func {}
+abstract class Func {
+    public abstract void accept(final FuncVisitor visitor);
+}
 
-class Equals extends Func {}
+class Equals extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class And extends Func {}
+class And extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class Or extends Func {}
+class Or extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class Implies extends Func {}
+class Implies extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class Not extends Func {}
+class Not extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class Contains extends Func {}
+class Contains extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
-class Get extends Func {}
+class Get extends Func {
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
 class CFunc extends Func {
     private String name;
@@ -130,6 +176,9 @@ class CFunc extends Func {
     }
     public String getName() {
         return name;
+    }
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -140,6 +189,9 @@ class Construct extends Func {
     }
     public String getDatatypeName() {
         return datatypeName;
+    }
+    public void accept(final FuncVisitor visitor) {
+        visitor.visit(this);
     }
 }
 

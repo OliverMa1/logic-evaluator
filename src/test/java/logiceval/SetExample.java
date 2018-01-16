@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
  * This is an example showing the use of sets and a custom finite "int" type
  */
 public class SetExample {
-
-    private Evaluator evaluator = new SimpleEvaluatorJava2();
+    private Evaluator evaluator = new SimpleEvaluatorJava3();
+    private Evaluator evaluator3 = new SimpleEvaluatorJava2();
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private CustomType t_int = type("int");
     private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));
@@ -112,7 +112,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }
