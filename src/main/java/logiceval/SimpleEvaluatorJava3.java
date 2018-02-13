@@ -160,6 +160,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
         }
         fillContainsMap(preProcExpr, containsExpr, equalsMap);
+        System.out.print(containsExpr);
         preProcExpr = expr;
         while (preProcExpr instanceof QuantifierExpr) {
             for(App expr1 : containsExpr) {

@@ -29,6 +29,7 @@ public class SetExample {
     private VarUse x = varuse("x");
     private VarUse y = varuse("y");
     private VarUse p = varuse("p");
+    private Func lt = func("lt");
 
 
     @Test
@@ -46,6 +47,28 @@ public class SetExample {
 
         System.out.println(expr);
         Object res = evaluator.eval(expr, structure);
+        assertEquals(true, res);
+    }
+    @Test
+    public void cnfTest() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
+
+        // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
+        Expr expr = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(or(contains(x, setA), new ConstantValue(false), app(lt,x,y)),
+                                or(contains(y, setB),eq(y,new ConstantValue(2))),
+                                eq(x, y))));
+
+        System.out.println(expr);
+        Object res = evaluator.eval(expr, structure);
+        QuantifierExpr a = (QuantifierExpr) expr;
+        a = (QuantifierExpr) a.getBody();
+        App expr1 = (App)a.getBody();
+
+        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(true, res);
     }
 
@@ -124,6 +147,9 @@ public class SetExample {
                     return a;
                 } else if (f.equals("setB")) {
                     return b;
+                }
+               else  if (f.equals("lt")) {
+                    return ((int) args[0]) <= ((int) args[1]);
                 }
                 throw new RuntimeException("TODO implement " + f);
             }
