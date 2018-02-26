@@ -152,78 +152,192 @@ public class SimpleEvaluatorJava3 implements Evaluator {
 
     private void preProcessing(Expr expr, Structure structure) {
         Set<Variable> variables = new HashSet<>();
-        Set<App> containsExpr = new HashSet<>();
+        HashMap<VarUse,App> containsExpr = new HashMap<>();
         Map<Variable, Expr> equalsMap = new HashMap<>();
+        HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
+        HashMap<Expr,HashSet<Expr>> containsToClause = new HashMap<>();
+        HashSet<Expr> clauses = new HashSet<>();
+
         Expr preProcExpr = expr;
         while (preProcExpr instanceof QuantifierExpr) {
             variables.add(((QuantifierExpr) preProcExpr).getVariable());
             preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
         }
-        fillContainsMap(preProcExpr, containsExpr, equalsMap);
+        fillContainsMap(preProcExpr, containsExpr, equalsMap,variables,predicateToClause, containsToClause, clauses,null);
         System.out.print(containsExpr);
-        preProcExpr = expr;
-        while (preProcExpr instanceof QuantifierExpr) {
-            for(App expr1 : containsExpr) {
-                List<Expr> args = expr1.getArgs();
-                // TODO wir haben APP cannot be cast to VARUSE, printe mal den typ davon aus :(
-                if (args.get(0) instanceof  VarUse) {
-                    VarUse varUse = (VarUse) args.get(0);
-                    Variable variable =(((QuantifierExpr) preProcExpr).getVariable());
-                    if (variable.getName().equals(varUse.getName())) {
-                        //((QuantifierExpr) preProcExpr).getVariable()
-                        //System.out.println(((QuantifierExpr) preProcExpr).getVariable().getName());
-                        SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(expr1.getArgs().get(1).toString(),null ));
-                        variable.setTyp(setTypeIterable);
-                    }
-                }
-                else  if (args.get(0) instanceof  App) {
-                    List<Expr> args1 = ((App) args.get(0)).getArgs();
-                    System.out.println("args: " + args1 + "func: " + ((App) args.get(0)).getFunc());
-                }
-            }
-            preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
-        }
         System.out.println("VARIABLES: " + variables.toString());
         System.out.println("CONTAINSEXPR: " + containsExpr.toString());
         System.out.println("EQUALSMAP: " + equalsMap.toString());
+        System.out.println("Predicate to Clause: " + predicateToClause.toString());
+        System.out.println("Contains to Clause: " + containsToClause.toString());
+        System.out.println("clauses: " + clauses.toString());
 
     }
 
-    private void fillContainsMap(Expr expr, Set<App> containsExpr, Map<Variable, Expr> equalsMap) {
+    private void fillContainsMap(Expr expr, HashMap<VarUse,App> containsExpr, Map<Variable, Expr> equalsMap,  Set<Variable> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<Expr,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause) {
 
         if (expr instanceof VarUse) {
-
+            // wenn wir in einer klausel sind, füge das als predikate hinzu mit predikate zu klausel
+            // gette, das zuerst, wenn null, dann egal, sonst füge dem Set die klausel hinzu
+            if (clause != null) {
+                HashSet<Expr> e = predicateToClause.get(expr);
+                if (e!= null) {
+                    e.add(clause);
+                }
+                else {
+                    e = new HashSet<>();
+                    e.add(clause);
+                    predicateToClause.put(expr, e);
+                }
+            }
+            else{
+                System.out.println("Fall dürfte nicht vorkommen in CNF");
+            }
         }
         else if (expr instanceof Undef) {
-
+            if (clause != null) {
+                HashSet<Expr> e = predicateToClause.get(expr);
+                if (e!= null) {
+                    e.add(clause);
+                }
+                else {
+                    e = new HashSet<>();
+                    e.add(clause);
+                    predicateToClause.put(expr, e);
+                }
+            }
+            else{
+                System.out.println("Fall dürfte nicht vorkommen in CNF");
+            }
         }
         else if (expr instanceof ConstantValue) {
-
+            if (clause != null) {
+                HashSet<Expr> e = predicateToClause.get(expr);
+                if (e!= null) {
+                    e.add(clause);
+                }
+                else {
+                    e = new HashSet<>();
+                    e.add(clause);
+                    predicateToClause.put(expr, e);
+                }
+            }
+            else{
+                System.out.println("Fall dürfte nicht vorkommen in CNF");
+            }
         }
         else if (expr instanceof QuantifierExpr) {
-            fillContainsMap(((QuantifierExpr) expr).getBody(), containsExpr, equalsMap);
+            variables.add(((QuantifierExpr) expr).getVariable());
+            fillContainsMap(((QuantifierExpr) expr).getBody(), containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
         }
         else if (expr instanceof App) {
             if (((App) expr).getFunc() instanceof Contains) {
-                containsExpr.add((App)expr);
-            }
-            else if (((App) expr).getFunc() instanceof Get) {
-
-            }
-            else if (((App) expr).getFunc() instanceof CFunc) {
-
-            }
-            else if (((App) expr).getFunc() instanceof Construct) {
-
-            }
-            else if (((App) expr).getFunc() instanceof Equals) {
-                for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap);
+                containsExpr.put((VarUse)((App) expr).getArgs().get(0),(App)expr);
+                if (clause != null) {
+                    HashSet<Expr> e = containsToClause.get(expr);
+                    if (e!= null) {
+                        e.add(clause);
+                    }
+                    else {
+                        e = new HashSet<>();
+                        e.add(clause);
+                        containsToClause.put(expr, e);
+                    }
+                }
+                else{
+                    System.out.println("Fall dürfte nicht vorkommen in CNF");
                 }
             }
-            else {
+            else if (((App) expr).getFunc() instanceof Get) {
+                if (clause != null) {
+                    HashSet<Expr> e = predicateToClause.get(expr);
+                    if (e!= null) {
+                        e.add(clause);
+                    }
+                    else {
+                        e = new HashSet<>();
+                        e.add(clause);
+                        predicateToClause.put(expr, e);
+                    }
+                }
+                else{
+                    System.out.println("Fall dürfte nicht vorkommen in CNF");
+                }
+            }
+            else if (((App) expr).getFunc() instanceof CFunc) {
+                if (clause != null) {
+                    HashSet<Expr> e = predicateToClause.get(expr);
+                    if (e!= null) {
+                        e.add(clause);
+                    }
+                    else {
+                        e = new HashSet<>();
+                        e.add(clause);
+                        predicateToClause.put(expr, e);
+                    }
+                }
+                else{
+                    System.out.println("Fall dürfte nicht vorkommen in CNF");
+                }
+            }
+            else if (((App) expr).getFunc() instanceof Construct) {
+                if (clause != null) {
+                    HashSet<Expr> e = predicateToClause.get(expr);
+                    if (e!= null) {
+                        e.add(clause);
+                    }
+                    else {
+                        e = new HashSet<>();
+                        e.add(clause);
+                        predicateToClause.put(expr, e);
+                    }
+                }
+                else{
+                    System.out.println("Fall dürfte nicht vorkommen in CNF");
+                }
+            }
+            else if (((App) expr).getFunc() instanceof Equals) {
+                if (clause != null) {
+                    HashSet<Expr> e = predicateToClause.get(expr);
+                    if (e!= null) {
+                        e.add(clause);
+                    }
+                    else {
+                        e = new HashSet<>();
+                        e.add(clause);
+                        predicateToClause.put(expr, e);
+                    }
+                }
+                else{
+                    System.out.println("Fall dürfte nicht vorkommen in CNF");
+                }
+            }
+            else if (((App) expr).getFunc() instanceof And) {
+                // wenn einer der argument ein and function ist, dann ist es keine clausel..
+                // vielleicht vorher checken?? ja, wenn einer der beiden keine and ist, dann muss es eine klausel sein
+                //und alles da drin ist dann eine klausel!!
                 for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap);
+                    System.out.println("Argumente: " + e);
+                }
+                for (Expr e : ((App) expr).getArgs()) {
+                    if (e instanceof App) {
+                        if (!(((App) e).getFunc() instanceof And)) {
+                            clause = e;
+                            clauses.add(clause);
+                        }
+                    }
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+                }
+            }
+            else if (((App) expr).getFunc() instanceof Or) {
+                for (Expr e : ((App) expr).getArgs()) {
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+                }
+            }
+            else
+                {
+                for (Expr e : ((App) expr).getArgs()) {
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
                 }
                 fillEqualsMapping(expr, equalsMap);
             }
