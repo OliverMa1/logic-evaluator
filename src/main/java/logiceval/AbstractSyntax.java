@@ -18,6 +18,7 @@ abstract class Expr {
     public String toString(){
         return PrintExpr.printExpr(this);
     }
+    public boolean equals(Object o) {return this.toString().equals(o.toString());}
     public abstract void acceptEval(final ExprVisitor visitor);
 }
 
@@ -39,6 +40,7 @@ class Variable {
     public Type getType() {
         return typ;
     }
+    public boolean equals(Object o){return this.toString().equals(o.toString());}
     public String toString() { return name;}
 }
 
@@ -119,9 +121,9 @@ class ConstantValue extends Expr {
 
 abstract class Quantifier {}
 
-class Exists extends Quantifier {}
+class Exists extends Quantifier {public String toString() {return "Exists";}}
 
-class Forall extends Quantifier {}
+class Forall extends Quantifier {public String toString() {return "Forall";}}
 
 abstract class Func {
     public abstract void accept(final FuncVisitor visitor);

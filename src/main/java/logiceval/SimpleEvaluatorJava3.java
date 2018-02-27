@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static logiceval.JavaDsl.not;
+
 /**
  * Created by Oliver on 21.11.2017.
  */
@@ -151,8 +153,8 @@ public class SimpleEvaluatorJava3 implements Evaluator {
     }
 
     private void preProcessing(Expr expr, Structure structure) {
-        Set<Variable> variables = new HashSet<>();
-        HashMap<VarUse,App> containsExpr = new HashMap<>();
+        Map<Variable, Quantifier> variables = new HashMap<>();
+        HashMap<String,App> containsExpr = new HashMap<>();
         Map<Variable, Expr> equalsMap = new HashMap<>();
         HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
         HashMap<Expr,HashSet<Expr>> containsToClause = new HashMap<>();
@@ -160,10 +162,10 @@ public class SimpleEvaluatorJava3 implements Evaluator {
 
         Expr preProcExpr = expr;
         while (preProcExpr instanceof QuantifierExpr) {
-            variables.add(((QuantifierExpr) preProcExpr).getVariable());
+            variables.put(((QuantifierExpr) preProcExpr).getVariable(), ((QuantifierExpr) preProcExpr).getQuantifier());
             preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
         }
-        fillContainsMap(preProcExpr, containsExpr, equalsMap,variables,predicateToClause, containsToClause, clauses,null);
+        fillContainsMap(preProcExpr, containsExpr, equalsMap,variables,predicateToClause, containsToClause, clauses,null, false);
         System.out.print(containsExpr);
         System.out.println("VARIABLES: " + variables.toString());
         System.out.println("CONTAINSEXPR: " + containsExpr.toString());
@@ -171,10 +173,72 @@ public class SimpleEvaluatorJava3 implements Evaluator {
         System.out.println("Predicate to Clause: " + predicateToClause.toString());
         System.out.println("Contains to Clause: " + containsToClause.toString());
         System.out.println("clauses: " + clauses.toString());
+        /* prüfe diese zwei fälle!!!!
+        1. existenzfall : in einer klausel steht genau ein containsausdruck, zugehörige variable ist
+        mit existenzquantor verbunden
+            1.1 gehe contains to clause durch, voraussetzung, finde contains ohne negation
+            1.2 checke ob get = getKey
+                1.2.1 wenn nein, breche ab
+                1.2.2 wenn ja, gehe alle übrigen
+        2. universalfall: in jeder klausel steht ein negietier containsausdruck, zugehörige variable ist
+        mit universalquantor verbunden
 
+        finde den fall heraus und manipuliere die struktur der formel, sodass wir nur noch über alle
+        A gehen, optional als erstes: werfe all diese ausdrücke raus oder setze true?? an deren stelle
+        a) werfe alle raus ist schwerer
+        b) ersetzen ist einfacher, vielleicht durch konstante true?
+
+        Danach normal ausführen! ist möglich, finde beispiel danach.
+         */
+        // Existenzquantorfall
+        for (Variable variable : variables.keySet()) {
+            //System.out.println("variables: " + variables.get(variable).toString());
+            if (variables.get(variable).toString().equals("Exists")){
+                //doExistentialCheck();
+                for (Expr e : containsToClause.keySet()){
+                    //System.out.println(((App)e).getArgs().get(0).toString() + " " + variable.toString() + " " + variable.equals(((App)e).getArgs().get(0)));
+                    System.out.println("func: " + ((App) e).getFunc() + " Expr: " + e + " 0: " + ((App)e).getArgs().get(0) + " var: " + variable);
+                    if (variable.equals(((App)e).getArgs().get(0))) {
+                        System.out.println("contains: " + e + " " + containsToClause.get(e) + ((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1));
+                        if (((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1)) {
+                            //doExistentialRemoval();
+                            System.out.println("neue Struktur: " + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                            SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                            variable.setTyp(setTypeIterable);
+                        }
+                    }
+                }
+            }
+            else {
+                //doUniversalCheck();
+                    if (variables.get(variable).toString().equals("Forall")) {
+                        boolean check = true;
+                        System.out.println("Forall Check");
+                        Expr e = containsExpr.get(variable.getName());
+                       // System.out.println(clauses.size());
+                        //System.out.println("" + e + containsToClause);
+                        if (((App)e).getFunc() instanceof Not) {
+                            //TODO equals funktioniert aus irgendeinem grund nicht richtig bei maps
+                            int counter = 0;
+                            for (Expr a : containsToClause.keySet()) {
+                                if (a.equals(e)) {
+                                    counter++;
+                                }
+                            }
+                            if (counter == clauses.size()) {
+                                e = ((App)e).getArgs().get(0);
+                                System.out.println("neue Struktur" + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                                SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                                variable.setTyp(setTypeIterable);
+                            }
+                        }
+                        //System.out.println(containsToClause.get(e).size());
+                    }
+            }
+        }
     }
 
-    private void fillContainsMap(Expr expr, HashMap<VarUse,App> containsExpr, Map<Variable, Expr> equalsMap,  Set<Variable> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<Expr,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause) {
+    private void fillContainsMap(Expr expr, HashMap<String,App> containsExpr, Map<Variable, Expr> equalsMap,  Map<Variable, Quantifier> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<Expr,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause, boolean not) {
 
         if (expr instanceof VarUse) {
             // wenn wir in einer klausel sind, füge das als predikate hinzu mit predikate zu klausel
@@ -182,13 +246,19 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             if (clause != null) {
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
-                    e.add(clause);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
                 else {
                     e = new HashSet<>();
-                    e.add(clause);
-                    predicateToClause.put(expr, e);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
+                predicateToClause.put(expr, e);
             }
             else{
                 System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -198,13 +268,19 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             if (clause != null) {
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
-                    e.add(clause);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
                 else {
                     e = new HashSet<>();
-                    e.add(clause);
-                    predicateToClause.put(expr, e);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
+                predicateToClause.put(expr, e);
             }
             else{
                 System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -214,25 +290,34 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             if (clause != null) {
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
-                    e.add(clause);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
                 else {
                     e = new HashSet<>();
-                    e.add(clause);
-                    predicateToClause.put(expr, e);
+                    if (not){
+                        e.add(not(clause));
+                    }
+                    else e.add(clause);
                 }
+                predicateToClause.put(expr, e);
             }
             else{
                 System.out.println("Fall dürfte nicht vorkommen in CNF");
             }
         }
         else if (expr instanceof QuantifierExpr) {
-            variables.add(((QuantifierExpr) expr).getVariable());
-            fillContainsMap(((QuantifierExpr) expr).getBody(), containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+            variables.put(((QuantifierExpr) expr).getVariable(), ((QuantifierExpr) expr).getQuantifier());
+            fillContainsMap(((QuantifierExpr) expr).getBody(), containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,false);
         }
         else if (expr instanceof App) {
             if (((App) expr).getFunc() instanceof Contains) {
-                containsExpr.put((VarUse)((App) expr).getArgs().get(0),(App)expr);
+                if (not) {
+                    containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), (App) not(expr));
+                }
+                else containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), (App)(expr));
                 if (clause != null) {
                     HashSet<Expr> e = containsToClause.get(expr);
                     if (e!= null) {
@@ -241,7 +326,10 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                     else {
                         e = new HashSet<>();
                         e.add(clause);
-                        containsToClause.put(expr, e);
+                        if (not) {
+                            containsToClause.put(not(expr), e);
+                        }
+                        else containsToClause.put(expr,e);
                     }
                 }
                 else{
@@ -252,13 +340,19 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 if (clause != null) {
                     HashSet<Expr> e = predicateToClause.get(expr);
                     if (e!= null) {
-                        e.add(clause);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
                     else {
                         e = new HashSet<>();
-                        e.add(clause);
-                        predicateToClause.put(expr, e);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
+                    predicateToClause.put(expr, e);
                 }
                 else{
                     System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -268,13 +362,18 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 if (clause != null) {
                     HashSet<Expr> e = predicateToClause.get(expr);
                     if (e!= null) {
-                        e.add(clause);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
                     else {
                         e = new HashSet<>();
-                        e.add(clause);
-                        predicateToClause.put(expr, e);
+                        if (not) {
+                            e.add(not(clause));
+                        } else e.add(clause);
                     }
+                    predicateToClause.put(expr, e);
                 }
                 else{
                     System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -284,13 +383,19 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 if (clause != null) {
                     HashSet<Expr> e = predicateToClause.get(expr);
                     if (e!= null) {
-                        e.add(clause);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
                     else {
                         e = new HashSet<>();
-                        e.add(clause);
-                        predicateToClause.put(expr, e);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
+                    predicateToClause.put(expr, e);
                 }
                 else{
                     System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -300,13 +405,19 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 if (clause != null) {
                     HashSet<Expr> e = predicateToClause.get(expr);
                     if (e!= null) {
-                        e.add(clause);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
                     else {
                         e = new HashSet<>();
-                        e.add(clause);
-                        predicateToClause.put(expr, e);
+                        if (not){
+                            e.add(not(clause));
+                        }
+                        else e.add(clause);
                     }
+                    predicateToClause.put(expr, e);
                 }
                 else{
                     System.out.println("Fall dürfte nicht vorkommen in CNF");
@@ -326,18 +437,24 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                             clauses.add(clause);
                         }
                     }
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
                 }
             }
             else if (((App) expr).getFunc() instanceof Or) {
                 for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
                 }
             }
+            else if (((App) expr).getFunc() instanceof Not) {
+                for (Expr e : ((App) expr).getArgs()) {
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,true);
+                }
+            }
+
             else
                 {
                 for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause);
+                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
                 }
                 fillEqualsMapping(expr, equalsMap);
             }

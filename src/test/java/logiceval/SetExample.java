@@ -50,7 +50,7 @@ public class SetExample {
         assertEquals(true, res);
     }
     @Test
-    public void cnfTest() {
+    public void cnfTestExists() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
         Structure structure = buildStructure(set1, set2);
@@ -58,8 +58,8 @@ public class SetExample {
         // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
         Expr expr = exists(var("x", t_int),
                 exists(var("y", t_int),
-                        and(or(contains(x, setA), new ConstantValue(false), app(lt,x,y)),
-                                or(contains(y, setB),eq(y,new ConstantValue(2))),
+                        and(or((contains(x, setA)), new ConstantValue(false), app(lt,x,y)),
+                                or(contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
                                 eq(x, y))));
 
         System.out.println(expr);
@@ -71,7 +71,72 @@ public class SetExample {
         System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(true, res);
     }
+    @Test
+    public void cnfTestExistsSimple() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
 
+        // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
+        Expr expr = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(or((contains(x, setA)), new ConstantValue(false), app(lt,x,y)),
+                                or(contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
+                                eq(x, y))));
+
+        System.out.println(expr);
+        Object res = evaluatorSimple.eval(expr, structure);
+        QuantifierExpr a = (QuantifierExpr) expr;
+        a = (QuantifierExpr) a.getBody();
+        App expr1 = (App)a.getBody();
+
+        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
+        assertEquals(true, res);
+    }
+    @Test
+    public void cnfTestForall() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
+
+        // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
+        Expr expr = forall(var("x", t_int),
+                forall(var("y", t_int),
+                        and(or(not(contains(x, setA)), new ConstantValue(false), app(lt,x,y)),
+                                or(not(contains(x,setA)),contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
+                                or(not(contains(x,setA)),eq(x, y)))));
+
+        System.out.println(expr);
+        Object res = evaluator.eval(expr, structure);
+        QuantifierExpr a = (QuantifierExpr) expr;
+        a = (QuantifierExpr) a.getBody();
+        App expr1 = (App)a.getBody();
+
+        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
+        assertEquals(false, res);
+    }
+    @Test
+    public void cnfTestForallSimple() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
+
+        // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
+        Expr expr = forall(var("x", t_int),
+                forall(var("y", t_int),
+                        and(or(not(contains(x, setA)), new ConstantValue(false), app(lt,x,y)),
+                                or(not(contains(x,setA)),contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
+                                or(not(contains(x,setA)),eq(x, y)))));
+
+        System.out.println(expr);
+        Object res = evaluatorSimple.eval(expr, structure);
+        QuantifierExpr a = (QuantifierExpr) expr;
+        a = (QuantifierExpr) a.getBody();
+        App expr1 = (App)a.getBody();
+
+        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
+        assertEquals(false, res);
+    }
     @Test
     public void test2() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
@@ -135,7 +200,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }
