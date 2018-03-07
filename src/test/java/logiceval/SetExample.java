@@ -4,6 +4,7 @@ package logiceval;
 import org.junit.Test;
 
 
+import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,10 @@ public class SetExample {
 
         System.out.println(expr);
         Object res = evaluator.eval(expr, structure);
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((App)expr).getArgs().get(1);
+        System.out.println(((App) expr).getArgs().get(0).getClass());
         assertEquals(true, res);
     }
     @Test

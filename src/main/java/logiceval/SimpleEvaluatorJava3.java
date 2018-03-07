@@ -155,7 +155,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
     private void preProcessing(Expr expr, Structure structure) {
         Map<Variable, Quantifier> variables = new HashMap<>();
         HashMap<String,App> containsExpr = new HashMap<>();
-        Map<Variable, Expr> equalsMap = new HashMap<>();
+        Map<Expr, Expr> equalsMap = new HashMap<>();
         HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
         HashMap<Expr,HashSet<Expr>> containsToClause = new HashMap<>();
         HashSet<Expr> clauses = new HashSet<>();
@@ -166,6 +166,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             preProcExpr = ((QuantifierExpr) preProcExpr).getBody();
         }
         fillContainsMap(preProcExpr, containsExpr, equalsMap,variables,predicateToClause, containsToClause, clauses,null, false);
+        preProcessEqualityStructures(equalsMap,containsExpr,variables,structure);
         System.out.print(containsExpr);
         System.out.println("VARIABLES: " + variables.toString());
         System.out.println("CONTAINSEXPR: " + containsExpr.toString());
@@ -202,7 +203,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                         System.out.println("contains: " + e + " " + containsToClause.get(e) + ((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1));
                         if (((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1)) {
                             //doExistentialRemoval();
-                            System.out.println("neue Struktur: " + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                            System.out.println("Existenzverbesserung!Neue Struktur für: "+ ((App) e).getArgs().get(1).toString()+ " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
                             SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
                             variable.setTyp(setTypeIterable);
                         }
@@ -217,19 +218,23 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                         Expr e = containsExpr.get(variable.getName());
                        // System.out.println(clauses.size());
                         //System.out.println("" + e + containsToClause);
-                        if (((App)e).getFunc() instanceof Not) {
-                            //TODO equals funktioniert aus irgendeinem grund nicht richtig bei maps
-                            int counter = 0;
-                            for (Expr a : containsToClause.keySet()) {
-                                if (a.equals(e)) {
-                                    counter++;
+                        //TODO warum kann e gleich null sein?
+                        System.out.println(variable.getName() + " " + containsExpr);
+                        if (e != null) {
+                            if (((App) e).getFunc() instanceof Not) {
+                                //TODO equals funktioniert aus irgendeinem grund nicht richtig bei maps
+                                int counter = 0;
+                                for (Expr a : containsToClause.keySet()) {
+                                    if (a.equals(e)) {
+                                        counter++;
+                                    }
                                 }
-                            }
-                            if (counter == clauses.size()) {
-                                e = ((App)e).getArgs().get(0);
-                                System.out.println("neue Struktur" + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
-                                SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
-                                variable.setTyp(setTypeIterable);
+                                if (counter == clauses.size()) {
+                                    e = ((App) e).getArgs().get(0);
+                                    System.out.println("Universalverbesserung!Neue Struktur für " + ((App) e).getArgs().get(1).toString() + " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(), null));
+                                    SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>) structure.interpretConstant(((App) e).getArgs().get(1).toString(), null));
+                                    variable.setTyp(setTypeIterable);
+                                }
                             }
                         }
                         //System.out.println(containsToClause.get(e).size());
@@ -238,8 +243,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
         }
     }
 
-    private void fillContainsMap(Expr expr, HashMap<String,App> containsExpr, Map<Variable, Expr> equalsMap,  Map<Variable, Quantifier> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<Expr,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause, boolean not) {
-
+    private void fillContainsMap(Expr expr, HashMap<String,App> containsExpr, Map<Expr, Expr> equalsMap,  Map<Variable, Quantifier> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<Expr,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause, boolean not) {
         if (expr instanceof VarUse) {
             // wenn wir in einer klausel sind, füge das als predikate hinzu mit predikate zu klausel
             // gette, das zuerst, wenn null, dann egal, sonst füge dem Set die klausel hinzu
@@ -313,11 +317,15 @@ public class SimpleEvaluatorJava3 implements Evaluator {
             fillContainsMap(((QuantifierExpr) expr).getBody(), containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,false);
         }
         else if (expr instanceof App) {
+            System.out.println(((App) expr).getFunc());
             if (((App) expr).getFunc() instanceof Contains) {
                 if (not) {
                     containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), (App) not(expr));
                 }
-                else containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), (App)(expr));
+                else {
+                    if (((App) expr).getArgs().get(0) instanceof VarUse)
+                    containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), (App)(expr));
+                }
                 if (clause != null) {
                     HashSet<Expr> e = containsToClause.get(expr);
                     if (e!= null) {
@@ -402,6 +410,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 }
             }
             else if (((App) expr).getFunc() instanceof Equals) {
+
                 if (clause != null) {
                     HashSet<Expr> e = predicateToClause.get(expr);
                     if (e!= null) {
@@ -422,13 +431,14 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 else{
                     System.out.println("Fall dürfte nicht vorkommen in CNF");
                 }
+                fillEqualsMapping((App)expr, equalsMap);
             }
             else if (((App) expr).getFunc() instanceof And) {
                 // wenn einer der argument ein and function ist, dann ist es keine clausel..
                 // vielleicht vorher checken?? ja, wenn einer der beiden keine and ist, dann muss es eine klausel sein
                 //und alles da drin ist dann eine klausel!!
                 for (Expr e : ((App) expr).getArgs()) {
-                    System.out.println("Argumente: " + e);
+                    //System.out.println("Argumente: " + e);
                 }
                 for (Expr e : ((App) expr).getArgs()) {
                     if (e instanceof App) {
@@ -451,21 +461,146 @@ public class SimpleEvaluatorJava3 implements Evaluator {
                 }
             }
 
-            else
-                {
-                for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
+            else {
+                    for (Expr e : ((App) expr).getArgs()) {
+                        fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
+                    }
                 }
-                fillEqualsMapping(expr, equalsMap);
-            }
         }
         else {
-            System.out.println(expr.getClass());
+            System.out.println("Missing cases: " + expr.getClass());
             //throw new RuntimeException("Missing cases");
         }
     }
-    private void fillEqualsMapping(Expr expr, Map<Variable, Expr> equalsMap) {
+    private void fillEqualsMapping(App expr, Map<Expr, Expr> equalsMap) {
+        System.out.println("Gleichheit gefunden!");
 
+        ExprVisitor exprVisitor = new ExprVisitor() {
+            @Override
+            public void visit(QuantifierExpr quantifierExpr) {
+
+            }
+
+            @Override
+            public void visit(VarUse varUse) {
+                equalsMap.put(varUse,expr);
+            }
+
+            @Override
+            public void visit(Undef undef) {
+
+            }
+
+            @Override
+            public void visit(ConstantValue constantValue) {
+                equalsMap.put(constantValue,expr);
+            }
+
+            @Override
+            public void visit(App app) {
+                equalsMap.put(app,expr);
+            }
+        };
+        expr.getArgs().get(0).acceptEval(exprVisitor);
+        expr.getArgs().get(1).acceptEval(exprVisitor);
+    }
+    private void preProcessEqualityStructures(Map<Expr,Expr> equalsMap, Map<String, App> containsExpr,Map<Variable, Quantifier> variables, Structure structure){
+        ExprVisitor exprVisitor = new ExprVisitor() {
+            @Override
+            public void visit(QuantifierExpr quantifierExpr) {
+
+            }
+
+            @Override
+            public void visit(VarUse varUse) {
+                Expr expr1 = containsExpr.get(varUse.toString());
+                if (!(((App) expr1).getFunc() instanceof Not)){
+                    System.out.println("inside " + expr1);
+                    System.out.println(((App)expr1).getArgs().get(1));
+                    SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>)structure.interpretConstant(((App)expr1).getArgs().get(1).toString(),null ));
+                    System.out.println("neues Set: " + setTypeIterable.getObjectSet());
+                }
+                else {
+                    System.out.println("rejected " + expr1);
+                }
+
+            }
+
+            @Override
+            public void visit(Undef undef) {
+
+            }
+
+            @Override
+            public void visit(ConstantValue constantValue) {
+
+            }
+
+            @Override
+            public void visit(App app) {
+                app.getFunc().accept(new FuncVisitor() {
+                    @Override
+                    public void visit(Equals equals) {
+
+                    }
+
+                    @Override
+                    public void visit(And and) {
+
+                    }
+
+                    @Override
+                    public void visit(Or or) {
+
+                    }
+
+                    @Override
+                    public void visit(Implies implies) {
+
+                    }
+
+                    @Override
+                    public void visit(Not not) {
+
+                    }
+
+                    @Override
+                    public void visit(Contains contains) {
+
+                    }
+
+                    @Override
+                    public void visit(Get get) {
+                      //  System.out.println("App args: " + app.getArgs().get(0) +" " +  app.getArgs().get(1));
+                       // System.out.println("App args Class: " + app.getArgs().get(0).getClass() +" " +  app.getArgs().get(1).getClass());
+                        Expr expr1 = app.getArgs().get(0);
+                        Expr expr2 = app.getArgs().get(1);
+                    }
+
+                    @Override
+                    public void visit(CFunc cFunc) {
+
+                    }
+
+                    @Override
+                    public void visit(Construct construct) {
+
+                    }
+                });
+            }
+        };
+        for (Expr e : equalsMap.values()) {
+            //System.out.println("Equality checks: " + e);
+            //System.out.println(((App)e).getArgs().get(0)+ " " + ((App) e).getArgs().get(0).getClass());
+            //System.out.println(containsExpr);
+            //System.out.println(containsExpr.get((((App)e).getArgs().get(1)).toString()));
+            //TODO check ob diese Variable nicht noch woanders vorkommt. muss contains entfernen wenn wir es benutzen
+            //TODO entferne die quantifizierung falls erfolgreich (hauptgewinn geliegt darin)
+            //TODO decide which side to take o.B.d.A. linke seite bis geklärt
+            ((App) e).getArgs().get(0).acceptEval(new ExprVisitorEval(equalsMap, containsExpr,variables ,structure));
+            //((App)e).getArgs().get(0).acceptEval(exprVisitor);
+            //((App)e).getArgs().get(0).acceptEval(exprVisitor);
+        }
     }
 }
 

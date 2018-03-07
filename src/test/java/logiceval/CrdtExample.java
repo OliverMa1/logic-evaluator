@@ -17,9 +17,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class CrdtExample {
 
-    private Evaluator evaluator = new SimpleEvaluatorJava();
+    private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private Evaluator evaluator2 = new SimpleEvaluatorJava2();
-    private Evaluator evaluator3 = new SimpleEvaluatorJava3();
+    private Evaluator evaluatorImproved = new SimpleEvaluatorJava3();
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
     private CustomType t_callId = type("callId");
@@ -61,7 +61,7 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         System.out.println(expr);
 
-        Object res = evaluator.eval(expr, structure);
+        Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
     }
 
@@ -84,7 +84,22 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         System.out.println(expr);
 
-        Object res = evaluator3.eval(expr, structure);
+        Object res = evaluatorImproved.eval(expr, structure);
+       /* expr = ((QuantifierExpr)expr).getBody();
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((App)expr).getArgs().get(0);
+        System.out.println((expr).getClass());
+        System.out.println(((App) expr).getArgs());
+        expr = ((App) expr).getArgs().get(1);
+        System.out.println(((App) expr).getArgs().get(0));
+        System.out.println(((App) expr).getArgs().get(1));
+        Expr expr1 = ((App) expr).getArgs().get(0);
+        expr = ((App) expr).getArgs().get(1);
+        System.out.println(((App) expr1).getFunc());
+        System.out.println(((App) expr).getArgs());
+        expr = ((App) expr).getArgs().get(0);
+        System.out.println(((App) expr).getFunc());*/
         assertEquals(false, res);
     }
 
@@ -106,7 +121,7 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         System.out.println(expr);
 
-        Object res = evaluator.eval(expr, structure);
+        Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
     }
     @Test
@@ -127,7 +142,7 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         System.out.println(expr);
 
-        Object res = evaluator2.eval(expr, structure);
+        Object res = evaluatorImproved.eval(expr, structure);
         assertEquals(false, res);
     }
 
@@ -152,7 +167,7 @@ public class CrdtExample {
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
-        Object res = evaluator.eval(expr, structure);
+        Object res = evaluatorSimple.eval(expr, structure);
         /*for (Object o : structure.values(t_callInfo)) {
             System.out.println(o.toString());
         }
@@ -183,13 +198,19 @@ public class CrdtExample {
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
-        Object res = evaluator2.eval(expr, structure);
+        Object res = evaluatorImproved.eval(expr, structure);
        /* for (Object o : structure.values(t_UserPair)) {
             System.out.println(o.toString());
         }
-        for (Object o : structure.values(t_callInfo)) {
-            System.out.println(o.toString());
+        for (Object y : structure.values(t_userId)) {
+            System.out.println(pair(x,x));
         }*/
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((QuantifierExpr)expr).getBody();
+        expr = ((App)expr).getArgs().get(1);
+        System.out.println(((App) expr));
+        System.out.println(((App) expr).getFunc());
+        System.out.println(((App) expr).getArgs().get(1).getClass());
         assertEquals(true, res);
 
     }
@@ -214,7 +235,7 @@ public class CrdtExample {
 
         Expr expr = mapExistsQuery();
         System.out.println(expr);
-        Object res = evaluator.eval(expr, structure);
+        Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(true, res);
 
     }
@@ -240,7 +261,7 @@ public class CrdtExample {
 
         Expr expr = mapExistsQuery();
         System.out.println(expr);
-        Object res = evaluator2.eval(expr, structure);
+        Object res = evaluatorImproved.eval(expr, structure);
         assertEquals(true, res);
 
     }
@@ -288,9 +309,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 500).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 500).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 500).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 550).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 550).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 10).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {
