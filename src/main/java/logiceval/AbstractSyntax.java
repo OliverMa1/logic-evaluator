@@ -13,6 +13,21 @@ import java.util.Set;
 public class AbstractSyntax {
 
 }
+class ExprWrapper {
+    Expr expr;
+
+    public void setExpr(Expr expr) {
+        this.expr = expr;
+    }
+
+    ExprWrapper(Expr expr) {
+        this.expr = expr;
+    }
+
+    public Expr getExpr() {
+        return expr;
+    }
+}
 abstract class Expr {
 
     public String toString(){
@@ -59,6 +74,12 @@ class App extends Expr {
         a.addAll(args);
         return a;
     }
+    public void setFunc(Func func) {
+        this.func = func;
+    }
+    public void setArgs(List<Expr> args) {
+        this.args = args;
+    }
     public void acceptEval(final ExprVisitor visitor){
         visitor.visit(this);
     }
@@ -84,6 +105,18 @@ class QuantifierExpr extends Expr {
     }
     public void acceptEval(final ExprVisitor visitor){
          visitor.visit(this);
+    }
+
+    public void setQuantifier(Quantifier quantifier) {
+        this.quantifier = quantifier;
+    }
+
+    public void setVariable(Variable variable) {
+        this.variable = variable;
+    }
+
+    public void setBody(Expr body) {
+        this.body = body;
     }
 }
 

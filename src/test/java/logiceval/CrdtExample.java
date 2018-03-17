@@ -83,23 +83,14 @@ public class CrdtExample {
 
         Expr expr = mapExistsQuery();
         System.out.println(expr);
-
-        Object res = evaluatorImproved.eval(expr, structure);
-       /* expr = ((QuantifierExpr)expr).getBody();
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((App)expr).getArgs().get(0);
-        System.out.println((expr).getClass());
-        System.out.println(((App) expr).getArgs());
-        expr = ((App) expr).getArgs().get(1);
-        System.out.println(((App) expr).getArgs().get(0));
-        System.out.println(((App) expr).getArgs().get(1));
-        Expr expr1 = ((App) expr).getArgs().get(0);
-        expr = ((App) expr).getArgs().get(1);
-        System.out.println(((App) expr1).getFunc());
-        System.out.println(((App) expr).getArgs());
-        expr = ((App) expr).getArgs().get(0);
-        System.out.println(((App) expr).getFunc());*/
+        CNFTransformer.removeImplication(expr);
+        System.out.println(expr);
+        CNFTransformer.removeNegation(expr);
+        System.out.println(expr);
+        expr = CNFTransformer.moveQuantorVariables(expr);
+        System.out.println(expr);
+       // Object res = evaluatorImproved.eval(expr, structure);
+        boolean res = false;
         assertEquals(false, res);
     }
 

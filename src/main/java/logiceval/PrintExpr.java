@@ -29,7 +29,7 @@ public class PrintExpr {
         String s = "";
         Func func = app.getFunc();
         if (func instanceof Equals) {
-            return "(" + printExpr(app.getArgs().get(0)) + " = " + printExpr(app.getArgs().get(1)) +")";
+            return "" + printExpr(app.getArgs().get(0)) + " = " + printExpr(app.getArgs().get(1)) +"";
         }
         else if (func instanceof And) {
             return "(" + printExpr(app.getArgs().get(0)) + " ∧ " + printExpr(app.getArgs().get(1)) +")";
@@ -41,13 +41,13 @@ public class PrintExpr {
             return "(" + printExpr(app.getArgs().get(0)) + " ⟶ " + printExpr(app.getArgs().get(1)) +")";
         }
         else if (func instanceof Not) {
-            return "(¬" + printExpr(app.getArgs().get(0)) + ")";
+            return "¬(" + printExpr(app.getArgs().get(0)) + ")";
         }
         else if (func instanceof Contains) {
-            return "(" + printExpr(app.getArgs().get(0)) + " ∈ " + printExpr(app.getArgs().get(1)) +")";
+            return "" + printExpr(app.getArgs().get(0)) + " ∈ " + printExpr(app.getArgs().get(1)) +"";
         }
         else if (func instanceof Get) {
-            return "(" + printExpr(app.getArgs().get(0)) + "[" + printExpr(app.getArgs().get(1)) +"])";
+            return "" + printExpr(app.getArgs().get(0)) + "[" + printExpr(app.getArgs().get(1)) +"]";
         }
         else if (func instanceof CFunc) {
             if (app.getArgs().size() == 0) {
@@ -64,12 +64,12 @@ public class PrintExpr {
             }
         }
         else if (func instanceof Construct) {
-            s +="(" + ((Construct) func).getDatatypeName() + "(";
+            s +="" + ((Construct) func).getDatatypeName() + "(";
             for (Expr expr : app.getArgs()) {
                 s += printExpr(expr) + ", ";
             }
             s = s.substring(0, s.length()-2);
-            s += "))";
+            s += ")";
             return s;
         }
         else throw new RuntimeException("Missing cases");

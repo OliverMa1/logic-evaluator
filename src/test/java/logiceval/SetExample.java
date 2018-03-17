@@ -134,12 +134,11 @@ public class SetExample {
                                 or(not(contains(x,setA)),eq(x, y)))));
 
         System.out.println(expr);
+        CNFTransformer.removeImplication(expr);
+        System.out.println(expr);
+        CNFTransformer.removeNegation(expr);
+        System.out.println(expr);
         Object res = evaluatorSimple.eval(expr, structure);
-        QuantifierExpr a = (QuantifierExpr) expr;
-        a = (QuantifierExpr) a.getBody();
-        App expr1 = (App)a.getBody();
-
-        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(false, res);
     }
     @Test
