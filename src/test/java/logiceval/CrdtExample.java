@@ -57,10 +57,8 @@ public class CrdtExample {
         happensBefore.add(pairValue(2,3));
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
-
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
-
+        expr = CNFTransformer.transform(expr);
         Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
     }
@@ -89,8 +87,9 @@ public class CrdtExample {
         System.out.println(expr);
         expr = CNFTransformer.moveQuantorVariables(expr);
         System.out.println(expr);
-       // Object res = evaluatorImproved.eval(expr, structure);
-        boolean res = false;
+        CNFTransformer.distributiveLaw(expr);
+        System.out.println(expr);
+        Object res = evaluatorImproved.eval(expr, structure);
         assertEquals(false, res);
     }
 

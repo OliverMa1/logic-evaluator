@@ -3,20 +3,23 @@ package logiceval;
 import java.util.ArrayList;
 
 import static logiceval.JavaDsl.list;
+import static logiceval.JavaDsl.var;
 
 public class ExprVisitorQuantor implements ExprVisitor{
     Expr expr;
     ExprWrapper originalExpr;
     ArrayList<QuantifierExpr> quantifierExprs;
-    public ExprVisitorQuantor(Expr expr, ExprWrapper originalExpr, ArrayList<QuantifierExpr> quantifierExprs){
+    int counter;
+    public ExprVisitorQuantor(Expr expr, ExprWrapper originalExpr, ArrayList<QuantifierExpr> quantifierExprs, int counter){
         this.expr = expr;
         this.originalExpr = originalExpr;
         this.quantifierExprs = quantifierExprs;
+        this.counter = counter;
     }
     @Override
     public void visit(QuantifierExpr quantifierExpr) {
+        // ändere variablen hier
         quantifierExprs.add(quantifierExpr);
-        //remove quantifier
         if (expr == null){
             originalExpr.setExpr(quantifierExpr.getBody());
         }
@@ -41,7 +44,8 @@ public class ExprVisitorQuantor implements ExprVisitor{
             // ignore
         }
         // TODO benenne alle variablenvorkommen um von quantifierExpr.getVariable()
-        quantifierExpr.getBody().acceptEval(new ExprVisitorQuantor(expr,originalExpr,quantifierExprs));
+        quantifierExpr.acceptEval(new ExprVisitorRemoveVariable(quantifierExpr.getVariable(),counter));
+        quantifierExpr.getBody().acceptEval(new ExprVisitorQuantor(expr,originalExpr,quantifierExprs, counter +1));
         //System.out.println(originalExpr);
     }
 
@@ -62,7 +66,8 @@ public class ExprVisitorQuantor implements ExprVisitor{
 
     @Override
     public void visit(App app) {
-        app.getFunc().accept(new FuncVisitorImplication(app,new ExprVisitorQuantor(app, originalExpr,quantifierExprs)));
+        app.getFunc().accept(new FuncVisitorImplication(app,new ExprVisitorQuantor(app, originalExpr,quantifierExprs, counter )));
     }
+
 
 }

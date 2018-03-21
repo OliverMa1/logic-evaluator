@@ -2,8 +2,8 @@ package logiceval;
 
 public class ExprVisitorNegation implements ExprVisitor {
     Expr expr;
-    Expr originalExpr;
-    public ExprVisitorNegation(Expr expr, Expr originalExpr){
+    ExprWrapper originalExpr;
+    public ExprVisitorNegation(Expr expr, ExprWrapper originalExpr){
         this.expr = expr;
         this.originalExpr = originalExpr;
     }

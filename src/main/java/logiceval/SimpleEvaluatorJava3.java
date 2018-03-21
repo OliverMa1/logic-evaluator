@@ -123,6 +123,7 @@ public class SimpleEvaluatorJava3 implements Evaluator {
 
     private Object evalVarUse(VarUse vu, Context context){
         Object a = context.getLocalVars().get(vu.getName());
+        System.out.println(context.getLocalVars() + " " + vu.getName());
         if (a == (null)) {
             throw new RuntimeException("Variable ${vu.name} not found.");
         }

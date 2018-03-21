@@ -6,8 +6,8 @@ import static logiceval.JavaDsl.not;
 public class FuncVisitorNot extends FuncVisitorClass {
     Expr expr;
     boolean changed = false;
-    Expr originalExpr;
-    public FuncVisitorNot(Expr expr, App app, ExprVisitor exprVisitor, Expr originalExpr) {
+    ExprWrapper originalExpr;
+    public FuncVisitorNot(Expr expr, App app, ExprVisitor exprVisitor, ExprWrapper originalExpr) {
      super(app, exprVisitor);
      this.expr = expr;
      this.originalExpr = originalExpr;
@@ -78,7 +78,7 @@ public class FuncVisitorNot extends FuncVisitorClass {
         // Negierung steht ganz vorne in der Formel
         if (changed) {
             if (expr == null) {
-                originalExpr = app.getArgs().get(0);
+                originalExpr.setExpr(app.getArgs().get(0));
             }
             // Negierung ist in einem Oder,Und, Nicht
             else if (expr instanceof App) {

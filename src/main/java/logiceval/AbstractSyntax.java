@@ -128,8 +128,14 @@ class Undef extends Expr{
 
 class VarUse extends Expr {
     private String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public VarUse(String name) {
         this.name = name;
+
     }
     public String getName() {
         return name;
