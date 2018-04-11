@@ -110,6 +110,9 @@ public class PrintExpr {
         else if (type instanceof CustomType) {
             return ((CustomType) type).getName();
         }
-        else throw new RuntimeException("Missing Cases");
+        else if (type instanceof SetTypeIterable) {
+            return ((SetTypeIterable) type).getName();
+        }
+        else throw new RuntimeException(type.getClass().toString());
     }
 }

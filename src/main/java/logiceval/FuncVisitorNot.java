@@ -96,7 +96,6 @@ public class FuncVisitorNot extends FuncVisitorClass {
             }
             // Negierung ist nach einem Quantor
             else if (expr instanceof QuantifierExpr) {
-                System.out.println("hier Quant");
                 ((QuantifierExpr) expr).setBody(app.getArgs().get(0));
             } else {
                 // ignore

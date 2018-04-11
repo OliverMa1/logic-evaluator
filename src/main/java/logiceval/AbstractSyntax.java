@@ -35,6 +35,7 @@ abstract class Expr {
     }
     public boolean equals(Object o) {return this.toString().equals(o.toString());}
     public abstract void acceptEval(final ExprVisitor visitor);
+    public abstract boolean acceptEquality(final ExprBooleanVisitor visitor);
 }
 
 class Variable {
@@ -83,6 +84,9 @@ class App extends Expr {
     public void acceptEval(final ExprVisitor visitor){
         visitor.visit(this);
     }
+    public boolean acceptEquality(final ExprBooleanVisitor visitor){
+        return visitor.visit(this);
+    }
 }
 
 class QuantifierExpr extends Expr {
@@ -118,11 +122,17 @@ class QuantifierExpr extends Expr {
     public void setBody(Expr body) {
         this.body = body;
     }
+    public boolean acceptEquality(final ExprBooleanVisitor visitor){
+        return visitor.visit(this);
+    }
 }
 
 class Undef extends Expr{
     public void acceptEval(final ExprVisitor visitor){
         visitor.visit(this);
+    }
+    public boolean acceptEquality(final ExprBooleanVisitor visitor){
+        return visitor.visit(this);
     }
 }
 
@@ -143,6 +153,9 @@ class VarUse extends Expr {
     public void acceptEval(final ExprVisitor visitor){
         visitor.visit(this);
     }
+    public boolean acceptEquality(final ExprBooleanVisitor visitor){
+        return visitor.visit(this);
+    }
 }
 
 class ConstantValue extends Expr {
@@ -155,6 +168,9 @@ class ConstantValue extends Expr {
     }
     public void acceptEval(final ExprVisitor visitor){
         visitor.visit(this);
+    }
+    public boolean acceptEquality(final ExprBooleanVisitor visitor){
+        return visitor.visit(this);
     }
 }
 
@@ -250,11 +266,16 @@ class SetType extends Type {
 
 class SetTypeIterable extends Type {
     private Set<Object> objectSet;
-    public SetTypeIterable(Set<Object> objectSet) {
+    private String name;
+    public SetTypeIterable(Set<Object> objectSet,String name) {
         this.objectSet = objectSet;
+        this.name = name;
     }
     public Set<Object> getObjectSet() {
         return objectSet;
+    }
+    public String getName(){
+        return this.name;
     }
 }
 

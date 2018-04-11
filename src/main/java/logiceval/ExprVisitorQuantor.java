@@ -38,7 +38,6 @@ public class ExprVisitorQuantor implements ExprVisitor{
         }
         // Negierung ist nach einem Quantor
         else if (expr instanceof QuantifierExpr) {
-            System.out.println("hier Quant");
             ((QuantifierExpr) expr).setBody(quantifierExpr.getBody());
         } else {
             // ignore

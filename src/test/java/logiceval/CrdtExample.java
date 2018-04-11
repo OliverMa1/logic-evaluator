@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 public class CrdtExample {
 
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
-    private Evaluator evaluator2 = new SimpleEvaluatorJava2();
     private Evaluator evaluatorImproved = new SimpleEvaluatorJava3();
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
@@ -80,14 +79,6 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
-        CNFTransformer.removeImplication(expr);
-        System.out.println(expr);
-        CNFTransformer.removeNegation(expr);
-        System.out.println(expr);
-        expr = CNFTransformer.moveQuantorVariables(expr);
-        System.out.println(expr);
-        CNFTransformer.distributiveLaw(expr);
         System.out.println(expr);
         Object res = evaluatorImproved.eval(expr, structure);
         assertEquals(false, res);
@@ -153,7 +144,7 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println("\n Print ende \n");
+        //System.out.println("\n Print ende \n");
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
@@ -188,6 +179,7 @@ public class CrdtExample {
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
+        System.out.println(expr);
         Object res = evaluatorImproved.eval(expr, structure);
        /* for (Object o : structure.values(t_UserPair)) {
             System.out.println(o.toString());
@@ -195,12 +187,7 @@ public class CrdtExample {
         for (Object y : structure.values(t_userId)) {
             System.out.println(pair(x,x));
         }*/
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((App)expr).getArgs().get(1);
-        System.out.println(((App) expr));
-        System.out.println(((App) expr).getFunc());
-        System.out.println(((App) expr).getArgs().get(1).getClass());
+
         assertEquals(true, res);
 
     }

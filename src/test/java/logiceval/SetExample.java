@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class SetExample {
     private Evaluator evaluator = new SimpleEvaluatorJava3();
-    private Evaluator evaluator3 = new SimpleEvaluatorJava2();
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private CustomType t_int = type("int");
     private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));
@@ -48,10 +47,6 @@ public class SetExample {
 
         System.out.println(expr);
         Object res = evaluator.eval(expr, structure);
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((QuantifierExpr)expr).getBody();
-        expr = ((App)expr).getArgs().get(1);
-        System.out.println(((App) expr).getArgs().get(0).getClass());
         assertEquals(true, res);
     }
     @Test
@@ -73,7 +68,6 @@ public class SetExample {
         a = (QuantifierExpr) a.getBody();
         App expr1 = (App)a.getBody();
 
-        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(true, res);
     }
     @Test
@@ -95,7 +89,6 @@ public class SetExample {
         a = (QuantifierExpr) a.getBody();
         App expr1 = (App)a.getBody();
 
-        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(true, res);
     }
     @Test
@@ -116,8 +109,6 @@ public class SetExample {
         QuantifierExpr a = (QuantifierExpr) expr;
         a = (QuantifierExpr) a.getBody();
         App expr1 = (App)a.getBody();
-
-        System.out.print(expr.getClass() + " " + expr1.getFunc() + expr1.getArgs());
         assertEquals(false, res);
     }
     @Test
@@ -133,11 +124,6 @@ public class SetExample {
                                 or(not(contains(x,setA)),contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
                                 or(not(contains(x,setA)),eq(x, y)))));
 
-        System.out.println(expr);
-        CNFTransformer.removeImplication(expr);
-        System.out.println(expr);
-        CNFTransformer.removeNegation(expr);
-        System.out.println(expr);
         Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
     }
@@ -204,7 +190,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 100).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }

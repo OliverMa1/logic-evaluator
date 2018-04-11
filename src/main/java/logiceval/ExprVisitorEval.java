@@ -31,7 +31,7 @@ public class ExprVisitorEval implements ExprVisitor {
             if (!(((App) expr1).getFunc() instanceof Not)) {
                 //System.out.println(((App)expr1).getArgs().get(1));
                 //TODO du sollst nicht, dass aus containsexpr getten sondern, was die variable tatsächlich durchläuft
-                SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>) structure.interpretConstant(((App) expr1).getArgs().get(1).toString(), null));
+                SetTypeIterable setTypeIterable = new SetTypeIterable((Set<Object>) structure.interpretConstant(((App) expr1).getArgs().get(1).toString(), null),((App) expr1).getArgs().get(1).toString());
                 System.out.println("Gleichheitverbesserung!Neues Set für " + varUse + " " + setTypeIterable.getObjectSet());
             } else {
                 System.out.println("rejected " + expr1);
