@@ -190,7 +190,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 100).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }

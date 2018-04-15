@@ -83,15 +83,11 @@ public class FuncVisitorNot extends FuncVisitorClass {
             // Negierung ist in einem Oder,Und, Nicht
             else if (expr instanceof App) {
                 if (((App) expr).getFunc() instanceof And || ((App) expr).getFunc() instanceof Or) {
-                    //System.out.println("and or " + expr);
                     if (((App) expr).getArgs().get(0).equals(app)) {
                         ((App) expr).setArgs(list(app.getArgs().get(0), ((App) expr).getArgs().get(1)));
                     } else {
                         ((App) expr).setArgs(list(((App) expr).getArgs().get(0), app.getArgs().get(0)));
                     }
-                } else if (((App) expr).getFunc() instanceof Not) {
-                   // System.out.println("not");
-                    // ((App) expr).setArgs(list(app.getArgs().get(0)));
                 }
             }
             // Negierung ist nach einem Quantor

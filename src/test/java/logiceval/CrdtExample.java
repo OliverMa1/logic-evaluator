@@ -59,6 +59,8 @@ public class CrdtExample {
         Expr expr = mapExistsQuery();
         expr = CNFTransformer.transform(expr);
         Object res = evaluatorSimple.eval(expr, structure);
+        expr = exists(var("x", t_userId),eq(x, new Undef()));
+        System.out.println("Lösung: " + evaluatorImproved.eval(expr,structure));
         assertEquals(false, res);
     }
 
@@ -286,9 +288,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 550).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 550).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 10).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 100).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 100).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 100).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {

@@ -21,7 +21,7 @@ public class ExprVisitorRemoveQuant implements ExprVisitor{
             Expr e = originalExpr.getExpr();
             while (e instanceof QuantifierExpr) {
                 String variableName = ((QuantifierExpr) e).getVariable().getName();
-                if (variableName.equals(variableName)) {
+                if (variableName.equals(varUse.getName())) {
                     if (expr == null) {
                         originalExpr.setExpr(((QuantifierExpr) e).getBody());
                     }
@@ -29,6 +29,7 @@ public class ExprVisitorRemoveQuant implements ExprVisitor{
                         ((QuantifierExpr) expr).setBody(((QuantifierExpr) e).getBody());
                     }
                 }
+                expr = e;
                 e = ((QuantifierExpr) e).getBody();
             }
         }

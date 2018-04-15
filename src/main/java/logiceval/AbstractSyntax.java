@@ -71,7 +71,7 @@ class App extends Expr {
         return func;
     }
     public List<Expr> getArgs() {
-        List<Expr> a = new ArrayList<Expr>();
+        List<Expr> a = new ArrayList<>();
         a.addAll(args);
         return a;
     }
@@ -265,13 +265,13 @@ class SetType extends Type {
 }
 
 class SetTypeIterable extends Type {
-    private Set<Object> objectSet;
+    private Set<?> objectSet;
     private String name;
-    public SetTypeIterable(Set<Object> objectSet,String name) {
+    public SetTypeIterable(Set<?> objectSet,String name) {
         this.objectSet = objectSet;
         this.name = name;
     }
-    public Set<Object> getObjectSet() {
+    public Set<?> getObjectSet() {
         return objectSet;
     }
     public String getName(){
@@ -361,15 +361,15 @@ class SimpleValue extends Value {
 }
 class DatatypeValue extends Value {
     private String name;
-    private Iterable<?> values;
-    public DatatypeValue(String name, Iterable<?> values) {
+    private List<?> values;
+    public DatatypeValue(String name, List<?> values) {
         this.name = name;
         this.values = values;
     }
     public String getName() {
         return name;
     }
-    public Iterable<?> getValues() {
+    public List<?> getValues() {
         return values;
     }
     public String toString() {

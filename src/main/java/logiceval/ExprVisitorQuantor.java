@@ -25,14 +25,14 @@ public class ExprVisitorQuantor implements ExprVisitor{
         }
         else if (expr instanceof App) {
             if (((App) expr).getFunc() instanceof And || ((App) expr).getFunc() instanceof Or) {
-                //System.out.println("and or " + expr);
+
                 if (((App) expr).getArgs().get(0).equals(quantifierExpr)) {
                     ((App) expr).setArgs(list(quantifierExpr.getBody(), ((App) expr).getArgs().get(1)));
                 } else {
                     ((App) expr).setArgs(list(((App) expr).getArgs().get(0), quantifierExpr.getBody()));
                 }
             } else if (((App) expr).getFunc() instanceof Not) {
-                // System.out.println("not");
+
                  ((App) expr).setArgs(list(quantifierExpr.getBody()));
             }
         }
@@ -45,7 +45,7 @@ public class ExprVisitorQuantor implements ExprVisitor{
         // TODO benenne alle variablenvorkommen um von quantifierExpr.getVariable()
         quantifierExpr.acceptEval(new ExprVisitorRemoveVariable(quantifierExpr.getVariable(),counter));
         quantifierExpr.getBody().acceptEval(new ExprVisitorQuantor(expr,originalExpr,quantifierExprs, counter +1));
-        //System.out.println(originalExpr);
+
     }
 
     @Override

@@ -28,13 +28,14 @@ public abstract class Structure {
                     arrayList.add(new DatatypeValue(d.getName(), objects));
                 }
             }
+
             return arrayList;
         }
         else if (typ instanceof CustomType) {
             return valuesForCustomType((CustomType)typ);
         }
         else if (typ instanceof SetTypeIterable) {
-            return new ArrayList<Object>(((SetTypeIterable) typ).getObjectSet());
+            return new ArrayList<>(((SetTypeIterable) typ).getObjectSet());
         }
         else {
             throw new RuntimeException("Fall vergessen");
@@ -53,7 +54,7 @@ public abstract class Structure {
             Type first = fields.get(0);
             List<Object> firstList = (values(first));
             for (Object objects : firstList) {
-                List<Object> ark = new ArrayList<Object>();
+                List<Object> ark = new ArrayList<>();
                 ark.add(objects);
                 arrayList.add(ark);
             }
