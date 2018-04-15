@@ -30,10 +30,19 @@ class ExprWrapper {
 }
 abstract class Expr {
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     public String toString(){
         return PrintExpr.printExpr(this);
     }
-    public boolean equals(Object o) {return this.toString().equals(o.toString());}
     public abstract void acceptEval(final ExprVisitor visitor);
     public abstract boolean acceptEquality(final ExprBooleanVisitor visitor);
 }
@@ -56,7 +65,17 @@ class Variable {
     public Type getType() {
         return typ;
     }
-    public boolean equals(Object o){return this.toString().equals(o.toString());}
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     public String toString() { return name;}
 }
 
@@ -252,7 +271,17 @@ class Construct extends Func {
     }
 }
 
-abstract class Type {}
+abstract class Type {
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+}
 
 class SetType extends Type {
     private Type elementType;
@@ -348,7 +377,17 @@ class FunctionType {
     }
 }
 
-abstract class Value {}
+abstract class Value {
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+}
 
 class SimpleValue extends Value {
     private Object value;
@@ -373,22 +412,29 @@ class DatatypeValue extends Value {
         return values;
     }
     public String toString() {
-        // TODO name gewünscht?
         String ausgabe = name +", ";
         //String ausgabe = "";
         Iterator<?> iterator = values.iterator();
         while(iterator.hasNext()){
             ausgabe += iterator.next().toString() +", ";
         }
-        //TODO was machen wenn kein iterable übergeben wurde
         if (ausgabe.length() <= 1) {
             return name;
         }
         return ausgabe.substring(0,ausgabe.length()-2);
     }
+
     @Override
-    public boolean equals (Object o) {
-        return toString().equals(o.toString());
+    public boolean equals(Object o) {
+        return this.toString().equals(o.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (values != null ? values.hashCode() : 0);
+        return result;
     }
 }
 
