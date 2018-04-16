@@ -16,7 +16,7 @@ import static logiceval.JavaDsl.not;
  * Created by Oliver on 21.11.2017.
  */
 // TODO
-public class SimpleEvaluatorJava3 implements Evaluator {
+public class ImprovedEvaluator implements Evaluator {
     HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
     Map<VarUse,List <HashSet<Expr>>> varUseListMap = new HashMap<>();
     HashMap<Expr,List <HashSet<Expr>>> negatedEqualities = new HashMap<>();

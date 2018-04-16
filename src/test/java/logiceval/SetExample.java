@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
  * This is an example showing the use of sets and a custom finite "int" type
  */
 public class SetExample {
-    private Evaluator evaluator = new SimpleEvaluatorJava3();
+    private Evaluator evaluator = new ImprovedEvaluator();
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private CustomType t_int = type("int");
     private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));

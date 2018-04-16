@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class CrdtExample {
 
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
-    private Evaluator evaluatorImproved = new SimpleEvaluatorJava3();
+    private Evaluator evaluatorImproved = new ImprovedEvaluator();
     private CustomType t_String = type("string");
     private CustomType t_userId = type("userId");
     private CustomType t_callId = type("callId");

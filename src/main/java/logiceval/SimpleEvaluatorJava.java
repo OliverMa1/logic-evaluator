@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 public class SimpleEvaluatorJava implements Evaluator {
     @Override
     public Object eval(Expr expr, Structure structure) {
-        final Context context = new Context(structure, new HashMap<String,Object>()); // problem context jedes mal neu :(
+        final Context context = new Context(structure, new HashMap<>());
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -74,7 +74,7 @@ public class SimpleEvaluatorJava implements Evaluator {
             }else { return r;}
         }
         else if (f instanceof CFunc) {
-            List<Object> args2 = new ArrayList<Object>();
+            List<Object> args2 = new ArrayList<>();
             for (Expr x : args) {
                 args2.add(eval(x, context));
             }
@@ -82,7 +82,7 @@ public class SimpleEvaluatorJava implements Evaluator {
             return ase;
         }
         else if (f instanceof Construct) {
-            List<Object> args2 = new ArrayList<Object>();
+            List<Object> args2 = new ArrayList<>();
             for (Expr x : args) {
                 // TODO pair[User1,User2] usw. ist nicht gewollt
                 args2.add(eval(x, context));
@@ -127,7 +127,7 @@ public class SimpleEvaluatorJava implements Evaluator {
     }
 
     private Context copy(Context context, Structure structure) {
-        Context newContext = new Context(structure, new HashMap<String, Object>());
+        Context newContext = new Context(structure, new HashMap<>());
         for (String s : context.getLocalVars().keySet()) {
             String s1 = s;
             // TODO deep or shallow
