@@ -17,16 +17,27 @@ import static logiceval.JavaDsl.not;
  */
 // TODO
 public class ImprovedEvaluator implements Evaluator {
+    // Speichere in welchen Klauseln Expr vorkommen
     HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
+    // Speichere in welchen Klauseln welche Variablen benutzt werden
     Map<VarUse,List <HashSet<Expr>>> varUseListMap = new HashMap<>();
+    // Speichere wo negierte Gleichheiten vorkommen
     HashMap<Expr,List <HashSet<Expr>>> negatedEqualities = new HashMap<>();
+    // Speichere die Reihenfolge der Quantoren
     List<QuantifierExpr> quantifierExprs = new ArrayList<>();
+    // Speichere Verbindung zwischen Variable und Quantor
     Map<Variable, Quantifier> variables = new HashMap<>();
+    // Speichere Verbindung zwischen Variablenname und Quantor
     Map<String, Quantifier> variableNames = new HashMap<>();
+    // Speichere Verbindung zwischen Variable und Variablennamen
     Map<String, Variable> namesToVariables = new HashMap<>();
+    // Speichere eine Wegbeschreibung für die Gleichheitsverbesserung
     Map<VarUse,List<Object>> varUseDirections = new HashMap<>();
+    // Speichere welche Gleichheiten verbessert wurden
     Map<Expr, Expr> improvedEqualities = new HashMap<>();
+    // speichere in welchen Gleichheiten welche Variablenbenutzungen vorkommen
     Map<Expr, Expr> varUseToEqualityMap = new HashMap<>();
+    // Speichere die Auswertung einer GleichheitsSeite zu dem Datenwert
     Map<Expr, Object> dataValueToOneSide = new HashMap<>();
     Structure structure;
 
@@ -404,7 +415,6 @@ public class ImprovedEvaluator implements Evaluator {
     private Expr preProcessEquality(Expr expr,Map<App,List <HashSet<Expr>>> equalsMap){
         // Iteriere alle Gleichheitsausdrücke
         // Um auf die Mengen später zuzugreifen und die Datentypen zu vergleichen.
-        Map<Expr,List<Object>> valueToSets = new HashMap<>();
         for (Expr equality : equalsMap.keySet()){
             if (negatedEqualities.get(equality) != null) {
                 return checkEqualityForall(expr, equality);

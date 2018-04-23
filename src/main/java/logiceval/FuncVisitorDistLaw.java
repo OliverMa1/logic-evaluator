@@ -23,13 +23,12 @@ public class FuncVisitorDistLaw extends FuncVisitorClass {
         Expr left = app.getArgs().get(0);
         Expr right = app.getArgs().get(1);
         if (left instanceof App){
+            //TODO copy
             if (((App) left).getFunc() instanceof And) {
                 Expr newLeft = or(((App) left).getArgs().get(0),right);
                 Expr newRight = or(((App) left).getArgs().get(1),right);
                 app.setArgs(list(newLeft,newRight));
                 app.setFunc(new And());
-                app.getArgs().get(0).acceptEval(exprVisitor);
-                app.getArgs().get(1).acceptEval(exprVisitor);
             }
         } else if (right instanceof App){
             Expr newLeft = or(((App) right).getArgs().get(0),left);
