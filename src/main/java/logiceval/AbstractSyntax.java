@@ -426,16 +426,30 @@ class DatatypeValue extends Value {
 
     @Override
     public boolean equals(Object o) {
-        return this.toString().equals(o.toString());
+        if (this == o) return true;
+        if (!(o instanceof DatatypeValue)) return false;
+        //if (!super.equals(o)) return false;
+
+        DatatypeValue that = (DatatypeValue) o;
+        //System.out.println(name +  values + ((DatatypeValue) o).name + ((DatatypeValue) o).values);
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return values != null ? values.equals(that.values) : that.values == null;
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
+        int result = 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (values != null ? values.hashCode() : 0);
         return result;
     }
+
+   /* @Override
+    public boolean equals(Object o) {
+        return this.toString().equals(o.toString());
+    }*/
+
+
 }
 
 class UndefinedValue extends Value {}

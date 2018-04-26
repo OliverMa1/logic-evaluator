@@ -1,7 +1,11 @@
 package logiceval;
 
+import junit.extensions.RepeatedTest;
 import logiceval.AbstractSyntax.*;
+import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 //import scala.collection.immutable.Set;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,6 +19,7 @@ import static org.junit.Assert.assertEquals;
  * This is an example modeling CRDTs similar to the userbase example
  * (see https://github.com/peterzeller/repliss/blob/1bf75c9c09f4dc412db4a7410d1c4662c2a73070/src/main/resources/examples/userbase.rpls )
  */
+
 public class CrdtExample {
 
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
@@ -40,8 +45,7 @@ public class CrdtExample {
     private VarUse x = varuse("x");
     private VarUse p = varuse("p");
 
-
-    @Test
+    @Test(timeout = 600000)
     public void test1Simple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -57,14 +61,17 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
         Expr expr = mapExistsQuery();
-        expr = CNFTransformer.transform(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
-        expr = exists(var("x", t_userId),eq(x, new Undef()));
-        System.out.println("Lösung: " + evaluatorImproved.eval(expr,structure));
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        /*expr = exists(var("x", t_userId),eq(x, new Undef()));
+        System.out.println("Lösung: " + evaluatorImproved.eval(expr,structure));*/
         assertEquals(false, res);
     }
 
-    @Test
+    @Test(timeout = 600000)
     public void test1() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -81,55 +88,68 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(false, res);
     }
 
-    @Test
+    @Test(timeout = 600000)
     public void test2Simple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
         visibleCalls.add(2);
         visibleCalls.add(3);
         HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
-        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String42"));
-        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String12"));
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
         callOps.put(3, dataTypeValue("mapDelete", "User1"));
         Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(1,2));
         happensBefore.add(pairValue(2,3));
+
+
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
-
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+
         assertEquals(false, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void test2() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
         visibleCalls.add(2);
         visibleCalls.add(3);
         HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
-        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String42"));
-        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String12"));
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
         callOps.put(3, dataTypeValue("mapDelete", "User1"));
         Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(1,2));
         happensBefore.add(pairValue(2,3));
+
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
-
+        long startTime = System.nanoTime();
         Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(false, res);
     }
 
-    @Test
+    @Test(timeout = 600000)
     public void dataTypeTestSimple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -150,7 +170,11 @@ public class CrdtExample {
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         /*for (Object o : structure.values(t_callInfo)) {
             System.out.println(o.toString());
         }
@@ -160,7 +184,7 @@ public class CrdtExample {
         assertEquals(true, res);
 
     }
-    @Test
+    @Test(timeout = 600000)
     public void dataTypeTest() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -177,12 +201,15 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println("\n Print ende \n");
         expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
-        System.out.println(expr);
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
        /* for (Object o : structure.values(t_UserPair)) {
             System.out.println(o.toString());
         }
@@ -193,7 +220,7 @@ public class CrdtExample {
         assertEquals(true, res);
 
     }
-    @Test
+    @Test(timeout = 600000)
     public void test3Simple() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -213,13 +240,17 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(true, res);
 
     }
 
-    @Test
+    @Test(timeout = 600000)
     public void test3() {
         Set<Integer> visibleCalls = new HashSet<>();
         visibleCalls.add(1);
@@ -239,11 +270,80 @@ public class CrdtExample {
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
         Expr expr = mapExistsQuery();
-        System.out.println(expr);
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(true, res);
 
     }
+    @Test(timeout = 600000)
+    public void dnfTest(){
+        Expr c1 = varuse("c1");
+        Expr c2 = varuse("c2");
+        Expr f = varuse("f");
+        Expr v = varuse("v");
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
+        callOps.put(3, dataTypeValue("mapDelete", "User2"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+        Expr expr = and(new ConstantValue(false),new ConstantValue(false));
+        for (int i = 0; i<20;i++){
+            expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
+        }
+        //expr = new QuantifierExpr(new Exists(),var("c1",t_callId),expr);
+        long startTime = System.nanoTime();
+        Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        assertEquals(false,res);
+    }
+
+    @Test(timeout = 600000)
+    public void dnfTestSimple(){
+        Expr c1 = varuse("c1");
+        Expr c2 = varuse("c2");
+        Expr f = varuse("f");
+        Expr v = varuse("v");
+        Set<Integer> visibleCalls = new HashSet<>();
+        visibleCalls.add(1);
+        visibleCalls.add(2);
+        visibleCalls.add(3);
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        callOps.put(1, dataTypeValue("mapWrite", "User1", dataTypeValue("F_name"), "String1"));
+        callOps.put(2, dataTypeValue("mapWrite", "User2", dataTypeValue("F_mail"), "String2"));
+        callOps.put(3, dataTypeValue("mapDelete", "User2"));
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+        Expr expr = new ConstantValue(false);
+        for (int i = 0; i<200;i++){
+            expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
+        }
+        expr = new QuantifierExpr(new Exists(),var("c1",t_callId),expr);
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
+        Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        assertEquals(false,res);
+    }
+
 
 
     /**
@@ -288,9 +388,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 100).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 100).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 100).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, 1000).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, 1000).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {

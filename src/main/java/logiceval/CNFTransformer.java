@@ -9,6 +9,7 @@ public class CNFTransformer {
         expr = removeNegation(expr);
         expr = moveQuantorVariables(expr);
         distributiveLaw(expr);
+        //System.out.println(expr);
         return expr;
     }
     public static void removeImplication(Expr expr) {
@@ -54,32 +55,12 @@ public class CNFTransformer {
         }
         return exprWrapper.getExpr();
     }
-    public static void distributiveLaw(Expr expr){
-        expr.acceptEval(new ExprVisitor() {
-            @Override
-            public void visit(QuantifierExpr quantifierExpr) {
-                quantifierExpr.getBody().acceptEval(this);
-            }
-
-            @Override
-            public void visit(VarUse varUse) {
-
-            }
-
-            @Override
-            public void visit(Undef undef) {
-
-            }
-
-            @Override
-            public void visit(ConstantValue constantValue) {
-
-            }
-
-            @Override
-            public void visit(App app) {
-                app.getFunc().accept(new FuncVisitorDistLaw(app,this));
-            }
-        });
+    public static void distributiveLaw(Expr expr) {
+        boolean flag = true;
+        while (flag){
+            ExprVisitorDistLaw exprVisitorDistLaw = new ExprVisitorDistLaw(false);
+            expr.acceptEval(exprVisitorDistLaw);
+            flag = exprVisitorDistLaw.isFlag();
+        }
     }
 }

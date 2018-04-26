@@ -47,8 +47,10 @@ public class ImprovedEvaluator implements Evaluator {
         final Context context = new Context(structure, new HashMap<>());
         //expr = preProcessing(expr, structure);
         expr = CNFTransformer.transform(expr);
-        //expr = preProcessing(expr, structure);
-        System.out.println("Nach preProcessing: " + preProcessing(expr, structure));
+        preProcessing(expr, structure);
+        //preProcessing(expr, structure);
+       /* System.out.println("Nach preProcessing: " + expr);
+        System.out.println(improvedEqualities +" " + varUseDirections + varUseToEqualityMap);*/
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -366,7 +368,7 @@ public class ImprovedEvaluator implements Evaluator {
                         //System.out.println("contains: " + e + " " + containsToClause.get(e) + ((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1));
                         if (((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1)) {
                             //doExistentialRemoval();
-                            System.out.println("Existenzverbesserung!Neue Struktur für: "+ ((App) e).getArgs().get(0).toString()+ " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
+                            //TODO System.out.println("Existenzverbesserung!Neue Struktur für: "+ ((App) e).getArgs().get(0).toString()+ " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(),null ));
                             Object o = structure.interpretConstant(((App) e).getArgs().get(1).toString(),null );
                             if (o instanceof Set<?>){
                                 SetTypeIterable setTypeIterable = new SetTypeIterable((Set<?>) o,((App) e).getArgs().get(1).toString());
@@ -384,11 +386,9 @@ public class ImprovedEvaluator implements Evaluator {
                     Expr e = containsExpr.get(variable.getName());
                     // System.out.println(clauses.size());
                     //System.out.println("" + e + containsToClause);
-                    //TODO warum kann e gleich null sein?
                     // System.out.println(variable.getName() + " " + containsExpr);
                     if (e != null) {
                         if (((App) e).getFunc() instanceof Not) {
-                            //TODO equals funktioniert aus irgendeinem grund nicht richtig bei maps
                             int counter = 0;
                             for (Expr a : containsToClause.keySet()) {
                                 if (a.equals(e)) {
@@ -397,7 +397,7 @@ public class ImprovedEvaluator implements Evaluator {
                             }
                             if (counter == clauses.size()) {
                                 e = ((App) e).getArgs().get(0);
-                                System.out.println("Universalverbesserung!Neue Struktur für " + ((App) e).getArgs().get(0).toString() + " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(), null));
+                                //TODO System.out.println("Universalverbesserung!Neue Struktur für " + ((App) e).getArgs().get(0).toString() + " " + structure.interpretConstant(((App) e).getArgs().get(1).toString(), null));
                                 Object o = structure.interpretConstant(((App) e).getArgs().get(1).toString(),null );
                                 if (o instanceof Set<?>) {
                                     SetTypeIterable setTypeIterable = new SetTypeIterable((Set<?>) o, ((App) e).getArgs().get(1).toString());
@@ -417,7 +417,7 @@ public class ImprovedEvaluator implements Evaluator {
         // Um auf die Mengen später zuzugreifen und die Datentypen zu vergleichen.
         for (Expr equality : equalsMap.keySet()){
             if (negatedEqualities.get(equality) != null) {
-                return checkEqualityForall(expr, equality);
+                 checkEqualityForall(expr, equality);
             }
             List<HashSet<Expr>> clauses = equalsMap.get(equality);
             if (clauses == null){
@@ -428,7 +428,7 @@ public class ImprovedEvaluator implements Evaluator {
 
                     // Alleinige Klausel mit Gleichheit drinnen
                     if (exprs.size() == 1 && exprs.contains(equality)){
-                        return checkEqualityExists(expr,equality);
+                         checkEqualityExists(expr,equality);
                     }
                 }
             }
@@ -445,7 +445,7 @@ public class ImprovedEvaluator implements Evaluator {
              */
 
         }
-        System.out.println("keine Verbesserungen für Gleichheit gefunden");
+        //TODO System.out.println("keine Verbesserungen für Gleichheit gefunden");
         return expr;
     }
     private Expr checkEqualityForall(Expr expr, Expr equality){

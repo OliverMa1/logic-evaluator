@@ -56,6 +56,7 @@ public class SimpleEvaluatorJava implements Evaluator {
         else if (f instanceof Implies) {
             return (!(Boolean) eval(args.get(0), context))
                     || ((Boolean) eval(args.get(1), context));
+
         }
         else if (f instanceof Not) {
             return (!(Boolean) eval(args.get(0), context));
@@ -121,7 +122,7 @@ public class SimpleEvaluatorJava implements Evaluator {
     private Object evalVarUse(VarUse vu, Context context){
         Object a = context.getLocalVars().get(vu.getName());
         if (a == (null)) {
-            throw new RuntimeException("Variable ${vu.name} not found.");
+            throw new RuntimeException("Variable ${vu.name} not found." + vu);
         }
         else return a;
     }

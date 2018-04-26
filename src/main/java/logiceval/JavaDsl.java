@@ -75,7 +75,7 @@ public class JavaDsl {
     }
 
     public static App pair(Expr c1, Expr c2) {
-        return construct("pair", c2, c1);
+        return construct("pair", c1, c2);
     }
 
     public static DatatypeValue pairValue(Object o1, Object o2) {

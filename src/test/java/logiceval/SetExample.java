@@ -32,7 +32,7 @@ public class SetExample {
     private Func lt = func("lt");
 
 
-    @Test
+    @Test(timeout = 600000)
     public void test1() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -45,11 +45,15 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-        System.out.println(expr);
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluator.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(true, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void cnfTestExists() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -70,7 +74,7 @@ public class SetExample {
 
         assertEquals(true, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void cnfTestExistsSimple() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -91,7 +95,7 @@ public class SetExample {
 
         assertEquals(true, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void cnfTestForall() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -111,7 +115,7 @@ public class SetExample {
         App expr1 = (App)a.getBody();
         assertEquals(false, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void cnfTestForallSimple() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -127,7 +131,7 @@ public class SetExample {
         Object res = evaluatorSimple.eval(expr, structure);
         assertEquals(false, res);
     }
-    @Test
+    @Test(timeout = 600000)
     public void test2() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
@@ -140,12 +144,15 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-        System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluator.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(false, res);
 
     }
-    @Test
+    @Test(timeout = 600000)
     public void test1Simple() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
@@ -158,12 +165,15 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-        System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(true, res);
     }
 
-    @Test
+    @Test(timeout = 600000)
     public void test2Simple() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
@@ -176,10 +186,50 @@ public class SetExample {
                                 contains(y, setB),
                                 eq(x, y))));
 
-        System.out.println(expr);
+        long startTime = System.nanoTime();
         Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
         assertEquals(false, res);
 
+    }
+    @Test(timeout = 600000)
+    public void dnfTestWithImprovement(){
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
+        Structure structure = buildStructure(set1, set2);
+        Expr expr = and(new ConstantValue(false),new ConstantValue(false));
+        for (int i = 0; i<15;i++){
+            expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
+        }
+        Expr expr1 = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(contains(x, setA),
+                                contains(y, setB),
+                                eq(x, y))));
+        expr = and(expr1,expr);
+        System.out.println(expr);
+        Object res = evaluator.eval(expr, structure);
+        assertEquals(false,res);
+    }
+    @Test(timeout = 600000)
+    public void dnfTestWithImprovementSimple(){
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
+        Structure structure = buildStructure(set1, set2);        Expr expr = and(new ConstantValue(false),new ConstantValue(false));
+        for (int i = 0; i<15;i++){
+            expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
+        }
+        Expr expr1 = exists(var("x", t_int),
+                exists(var("y", t_int),
+                        and(contains(x, setA),
+                                contains(y, setB),
+                                eq(x, y))));
+        expr = and(expr1,expr);
+        System.out.println(expr);
+        Object res = evaluatorSimple.eval(expr, structure);
+        assertEquals(false,res);
     }
 
 
@@ -190,7 +240,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }
