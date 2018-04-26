@@ -49,8 +49,8 @@ public class ImprovedEvaluator implements Evaluator {
         expr = CNFTransformer.transform(expr);
         preProcessing(expr, structure);
         //preProcessing(expr, structure);
-       /* System.out.println("Nach preProcessing: " + expr);
-        System.out.println(improvedEqualities +" " + varUseDirections + varUseToEqualityMap);*/
+        System.out.println("Nach preProcessing: " + expr);
+        System.out.println(improvedEqualities +" " + varUseDirections + varUseToEqualityMap);
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -364,7 +364,7 @@ public class ImprovedEvaluator implements Evaluator {
                 for (Expr e : containsToClause.keySet()){
                     //System.out.println(((App)e).getArgs().get(0).toString() + " " + variable.toString() + " " + variable.equals(((App)e).getArgs().get(0)));
                     //System.out.println("func: " + ((App) e).getFunc() + " Expr: " + e + " 0: " + ((App)e).getArgs().get(0) + " var: " + variable);
-                    if (variable.equals(((App)e).getArgs().get(0))) {
+                    if (variable.getName().equals(((App)e).getArgs().get(0).toString())) {
                         //System.out.println("contains: " + e + " " + containsToClause.get(e) + ((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1));
                         if (((containsToClause.get(e).contains(e)) && containsToClause.get(e).size() == 1)) {
                             //doExistentialRemoval();
