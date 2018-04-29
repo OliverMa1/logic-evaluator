@@ -156,10 +156,7 @@ public class ImprovedEvaluator implements Evaluator {
             dataValueToOneSide = new HashMap<>();
             for (Expr expr1 : improvedEqualities.keySet()) {
                 dataValueToOneSide.put( improvedEqualities.get(expr1),eval(expr1, newContext));
-                /*System.out.println(expr1);
-                System.out.println("Auswertung:" + eval(expr1, newContext));
-                System.out.println(dataValueToOneSide);
-                System.out.println(varUseToEqualityMap);*/
+
             }
         }
         Boolean b = (Boolean)eval(q.getBody(), newContext);
@@ -182,20 +179,14 @@ public class ImprovedEvaluator implements Evaluator {
             System.out.println(context.getStructure().values(typ));*/
             Object result = evaluation;
             if (evaluation instanceof DatatypeValue){
-                boolean goDeeper = false;
                 for (int i = 0; i < direction.size(); i++){
                     if (((DatatypeValue) evaluation).getName().equals(direction.get(0))){
-                        if (direction.get(i) instanceof Boolean){
-                            goDeeper = (Boolean) direction.get(i);
-                        } else {
                             if (direction.get(i) instanceof Integer) {
                                 int j = (int)direction.get(i);
-                                result = ((DatatypeValue) result).getValues().get(j);
+                                if(result instanceof DatatypeValue) {
+                                    result = ((DatatypeValue) result).getValues().get(j);
+                                }
                             }
-                            else {
-                                //result = null;//((DatatypeValue) result).getValues().get(j);
-                            }
-                        }
                     }
                     else if (direction.get(0).equals(false)){
                         result = evaluation;
@@ -209,27 +200,17 @@ public class ImprovedEvaluator implements Evaluator {
                 }
             }
             else{
-                //System.out.println("class here: "  + evaluation.getClass() + "wert: " + evaluation);
                 result = evaluation;
             }
-            /*System.out.println(vu);
-            System.out.println(direction);
-            System.out.println("eval: " + evaluation);
-            System.out.println("res: " + result);*/
-            //System.out.println("VarUse: " + vu + " wurde ersetzt durch " + result + " Ursprünglicher Wert: " + evaluation);
             return result;
         }
     }
     private boolean checkSets(Object result, VarUse vu){
         Variable v = namesToVariables.get(vu.getName());
-        //structure.interpretConstant(v.getType().toString(), null);
-       // System.out.println(v.getType() + "  " + v);
         if (v.getType() instanceof CustomType){
-            //System.out.println(structure.valuesForCustomType((CustomType)v.getType())+ " " + result + structure.valuesForCustomType((CustomType)v.getType()).contains(result));
             return structure.valuesForCustomType((CustomType)v.getType()).contains(result);
         }
         if (v.getType() instanceof DataType){
-            //System.out.println(((DataType) v.getType()).getConstructors());
             boolean res = true;
             for (DataTypeConstructor d : ((DataType) v.getType()).getConstructors()){
                 if (result instanceof DatatypeValue){
@@ -241,7 +222,6 @@ public class ImprovedEvaluator implements Evaluator {
                         }
                     }
                 }
-                    //System.out.println(d.getName() + " " + d.getFields()+ " result:  " + result.getClass());
             }
             return res;
         }
@@ -257,14 +237,16 @@ public class ImprovedEvaluator implements Evaluator {
                 return false;
             }
             boolean res = true;
+            boolean erg = false;
             for (DataTypeConstructor d : ((DataType) t).getConstructors()){
                 int counter = 0;
                 for (Type type : d.getFields()){
                     res &= checkSets(type, ((DatatypeValue)result).getValues().get(counter),v);
                     counter++;
                 }
+                erg = erg || res;
             }
-            return res;
+            return erg;
         }
         else{
             return false;
