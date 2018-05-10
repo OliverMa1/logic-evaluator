@@ -9,7 +9,6 @@ public class CNFTransformer {
         expr = removeNegation(expr);
         expr = moveQuantorVariables(expr);
         distributiveLaw(expr);
-        //System.out.println(expr);
         return expr;
     }
     public static void removeImplication(Expr expr) {

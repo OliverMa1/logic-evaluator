@@ -299,7 +299,7 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
         Expr expr = and(new ConstantValue(false),new ConstantValue(false));
-        for (int i = 0; i<20;i++){
+        for (int i = 0; i<10;i++){
             expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
         }
         //expr = new QuantifierExpr(new Exists(),var("c1",t_callId),expr);
@@ -331,7 +331,7 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
         Expr expr = new ConstantValue(false);
-        for (int i = 0; i<200;i++){
+        for (int i = 0; i<5;i++){
             expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
         }
         expr = new QuantifierExpr(new Exists(),var("c1",t_callId),expr);

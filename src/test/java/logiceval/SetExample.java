@@ -200,7 +200,7 @@ public class SetExample {
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
         Structure structure = buildStructure(set1, set2);
         Expr expr = and(new ConstantValue(false),new ConstantValue(false));
-        for (int i = 0; i<15;i++){
+        for (int i = 0; i<5;i++){
             expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
         }
         Expr expr1 = exists(var("x", t_int),
@@ -218,7 +218,7 @@ public class SetExample {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 33, 88));
         Structure structure = buildStructure(set1, set2);        Expr expr = and(new ConstantValue(false),new ConstantValue(false));
-        for (int i = 0; i<15;i++){
+        for (int i = 0; i<5;i++){
             expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
         }
         Expr expr1 = exists(var("x", t_int),
@@ -240,7 +240,7 @@ public class SetExample {
             public List<Object> valuesForCustomType(CustomType typ) {
                 if (typ.equals(t_int)) {
                     // return values from 1 to 2000
-                    return IntStream.range(1, 10000).<Object>mapToObj(x -> x).collect(Collectors.toList());
+                    return IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
                 } else {
                     throw new RuntimeException("unknown type: " + typ);
                 }
