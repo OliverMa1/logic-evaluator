@@ -2,9 +2,6 @@ package logiceval;
 
 import java.util.Map;
 
-/**
- * Created by Oliver on 14.12.2017.
- */
 public class Context {
 
     private Structure structure;

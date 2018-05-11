@@ -3,13 +3,12 @@ package logiceval;
 import java.util.ArrayList;
 
 import static logiceval.JavaDsl.list;
-import static logiceval.JavaDsl.var;
 
 public class ExprVisitorQuantor implements ExprVisitor{
-    Expr expr;
-    ExprWrapper originalExpr;
-    ArrayList<QuantifierExpr> quantifierExprs;
-    int counter;
+    private Expr expr;
+    private ExprWrapper originalExpr;
+    private ArrayList<QuantifierExpr> quantifierExprs;
+    private int counter;
     public ExprVisitorQuantor(Expr expr, ExprWrapper originalExpr, ArrayList<QuantifierExpr> quantifierExprs, int counter){
         this.expr = expr;
         this.originalExpr = originalExpr;
@@ -18,7 +17,7 @@ public class ExprVisitorQuantor implements ExprVisitor{
     }
     @Override
     public void visit(QuantifierExpr quantifierExpr) {
-        // ändere variablen hier
+
         quantifierExprs.add(quantifierExpr);
         if (expr == null){
             originalExpr.setExpr(quantifierExpr.getBody());
@@ -36,13 +35,10 @@ public class ExprVisitorQuantor implements ExprVisitor{
                  ((App) expr).setArgs(list(quantifierExpr.getBody()));
             }
         }
-        // Negierung ist nach einem Quantor
+
         else if (expr instanceof QuantifierExpr) {
             ((QuantifierExpr) expr).setBody(quantifierExpr.getBody());
-        } else {
-            // ignore
         }
-        // TODO benenne alle variablenvorkommen um von quantifierExpr.getVariable()
         quantifierExpr.acceptEval(new ExprVisitorRemoveVariable(quantifierExpr.getVariable(),counter));
         quantifierExpr.getBody().acceptEval(new ExprVisitorQuantor(expr,originalExpr,quantifierExprs, counter +1));
 

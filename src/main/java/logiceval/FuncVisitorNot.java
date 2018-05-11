@@ -4,9 +4,9 @@ import static logiceval.JavaDsl.list;
 import static logiceval.JavaDsl.not;
 
 public class FuncVisitorNot extends FuncVisitorClass {
-    Expr expr;
-    boolean changed = false;
-    ExprWrapper originalExpr;
+    private Expr expr;
+    private boolean changed = false;
+    private ExprWrapper originalExpr;
     public FuncVisitorNot(Expr expr, App app, ExprVisitor exprVisitor, ExprWrapper originalExpr) {
      super(app, exprVisitor);
      this.expr = expr;
@@ -70,17 +70,12 @@ public class FuncVisitorNot extends FuncVisitorClass {
                     app.setArgs(list(app1.getArgs().get(0)));
                     changed = true;
                 }
-                else {
-                    //ignore
-                }
             }
         });
-        // Negierung steht ganz vorne in der Formel
         if (changed) {
             if (expr == null) {
                 originalExpr.setExpr(app.getArgs().get(0));
             }
-            // Negierung ist in einem Oder,Und, Nicht
             else if (expr instanceof App) {
                 if (((App) expr).getFunc() instanceof And || ((App) expr).getFunc() instanceof Or) {
                     if (((App) expr).getArgs().get(0).equals(app)) {
@@ -90,7 +85,6 @@ public class FuncVisitorNot extends FuncVisitorClass {
                     }
                 }
             }
-            // Negierung ist nach einem Quantor
             else if (expr instanceof QuantifierExpr) {
                 ((QuantifierExpr) expr).setBody(app.getArgs().get(0));
             } else {

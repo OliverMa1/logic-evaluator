@@ -1,10 +1,6 @@
 package logiceval;
 
-import java.util.Set;
 
-/**
- * Created by Oliver on 26.11.2017.
- */
 public class PrintExpr {
     public static String printExpr(Expr expr) {
         if (expr instanceof App) {
@@ -26,7 +22,7 @@ public class PrintExpr {
     }
 
     private static String  handleApp(App app) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         Func func = app.getFunc();
         if (func instanceof Equals) {
             return "" + printExpr(app.getArgs().get(0)) + " = " + printExpr(app.getArgs().get(1)) +"";
@@ -54,23 +50,23 @@ public class PrintExpr {
                 return ((CFunc) func).getName();
             }
             else {
-                s += "(" +((CFunc) func).getName() + "(";
+                s.append("(").append(((CFunc) func).getName()).append("(");
                 for (Expr expr : app.getArgs()) {
-                    s += printExpr(expr) + ", ";
+                    s.append(printExpr(expr)).append(", ");
                 }
-                s = s.substring(0, s.length()-2);
-                s += "))";
-                return s;
+                s = new StringBuilder(s.substring(0, s.length() - 2));
+                s.append("))");
+                return s.toString();
             }
         }
         else if (func instanceof Construct) {
-            s +="" + ((Construct) func).getDatatypeName() + "(";
+            s.append("").append(((Construct) func).getDatatypeName()).append("(");
             for (Expr expr : app.getArgs()) {
-                s += printExpr(expr) + ", ";
+                s.append(printExpr(expr)).append(", ");
             }
-            s = s.substring(0, s.length()-2);
-            s += ")";
-            return s;
+            s = new StringBuilder(s.substring(0, s.length() - 2));
+            s.append(")");
+            return s.toString();
         }
         else throw new RuntimeException("Missing cases");
     }

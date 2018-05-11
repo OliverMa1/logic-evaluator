@@ -2,7 +2,6 @@ package logiceval;
 
 import static logiceval.JavaDsl.list;
 import static logiceval.JavaDsl.not;
-import static logiceval.JavaDsl.or;
 
 public class FuncVisitorImplication extends FuncVisitorClass{
     public FuncVisitorImplication(App app, ExprVisitor exprVisitor) {

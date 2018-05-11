@@ -1,12 +1,10 @@
 package logiceval;
 
-/**
- * Created by Oliver on 17.03.2018.
- */
+
 public class ExprVisitorRemoveVariable implements ExprVisitor {
-    Variable variable;
-    int counter;
-    ExprVisitorRemoveVariable exprVisitorRemoveVariable;
+    private Variable variable;
+    private int counter;
+    private ExprVisitorRemoveVariable exprVisitorRemoveVariable;
     public ExprVisitorRemoveVariable(Variable variable, int counter) {
         this.variable = variable;
         this.counter = counter;

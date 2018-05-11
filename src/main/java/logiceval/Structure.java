@@ -1,12 +1,8 @@
 package logiceval;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by Oliver on 23.11.2017.
- */
 
 public abstract class Structure {
     public abstract List<Object> valuesForCustomType(CustomType type);
@@ -63,14 +59,12 @@ public abstract class Structure {
         else {
             Type first = fields.get(0);
             firstValues = values(first);
-            // remove funktioniert nicht
             kr = valuesList(fields.subList(1,fields.size()));
         }
         for (Object o : firstValues) {
             for (List<Object> objectlists : kr) {
                 List<Object> ark = new ArrayList<>(objectlists);
                 ark.add(0,o);
-                // TODO name gewünscht?
                 //ark.add(0,name);
                 arrayList.add(ark);
             }

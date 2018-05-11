@@ -3,8 +3,6 @@ package logiceval;
 
 import org.junit.Test;
 
-
-import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -256,7 +254,7 @@ public class SetExample {
                else  if (f.equals("lt")) {
                     return ((int) args[0]) <= ((int) args[1]);
                 }
-                throw new RuntimeException("TODO implement " + f);
+                throw new RuntimeException("unknown constant " + f);
             }
 
         };

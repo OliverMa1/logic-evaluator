@@ -1,45 +1,34 @@
 package logiceval;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static logiceval.JavaDsl.not;
-import static logiceval.JavaDsl.var;
 
-/**
- * Created by Oliver on 21.11.2017.
- */
-// TODO
+
+
 public class ImprovedEvaluator implements Evaluator {
     // Speichere in welchen Klauseln Expr vorkommen
-    HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
+    private HashMap<Expr,HashSet<Expr>> predicateToClause = new HashMap<>();
     // Speichere in welchen Klauseln welche Variablen benutzt werden
-    Map<VarUse,List <HashSet<Expr>>> varUseListMap = new HashMap<>();
+    private Map<VarUse,List <HashSet<Expr>>> varUseListMap = new HashMap<>();
     // Speichere wo negierte Gleichheiten vorkommen
-    HashMap<Expr,List <HashSet<Expr>>> negatedEqualities = new HashMap<>();
+    private HashMap<Expr,List <HashSet<Expr>>> negatedEqualities = new HashMap<>();
     // Speichere die Reihenfolge der Quantoren
-    List<QuantifierExpr> quantifierExprs = new ArrayList<>();
+    private List<QuantifierExpr> quantifierExprs = new ArrayList<>();
     // Speichere Verbindung zwischen Variable und Quantor
-    Map<Variable, Quantifier> variables = new HashMap<>();
+    private Map<Variable, Quantifier> variables = new HashMap<>();
     // Speichere Verbindung zwischen Variablenname und Quantor
-    Map<String, Quantifier> variableNames = new HashMap<>();
+    private Map<String, Quantifier> variableNames = new HashMap<>();
     // Speichere Verbindung zwischen Variable und Variablennamen
-    Map<String, Variable> namesToVariables = new HashMap<>();
+    private Map<String, Variable> namesToVariables = new HashMap<>();
     // Speichere eine Wegbeschreibung für die Gleichheitsverbesserung
-    Map<VarUse,List<Object>> varUseDirections = new HashMap<>();
+    private Map<VarUse,List<Object>> varUseDirections = new HashMap<>();
     // Speichere welche Gleichheiten verbessert wurden
-    Map<Expr, Expr> improvedEqualities = new HashMap<>();
+    private Map<Expr, Expr> improvedEqualities = new HashMap<>();
     // speichere in welchen Gleichheiten welche Variablenbenutzungen vorkommen
-    Map<Expr, Expr> varUseToEqualityMap = new HashMap<>();
+    private Map<Expr, Expr> varUseToEqualityMap = new HashMap<>();
     // Speichere die Auswertung einer GleichheitsSeite zu dem Datenwert
-    Map<Expr, Object> dataValueToOneSide = new HashMap<>();
+    private Map<Expr, Object> dataValueToOneSide = new HashMap<>();
     Structure structure;
 
     @Override
@@ -51,7 +40,7 @@ public class ImprovedEvaluator implements Evaluator {
         preProcessing(expr, structure);
         //preProcessing(expr, structure);
         System.out.println("Nach preProcessing: " + expr);
-        System.out.println(improvedEqualities +" " + varUseDirections + varUseToEqualityMap);
+        System.out.println("Verbesserte Gleichheiten: " + improvedEqualities +" Wegbeschreibung: " + varUseDirections);
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -79,7 +68,6 @@ public class ImprovedEvaluator implements Evaluator {
         Func f = a.getFunc();
         List<Expr> args = a.getArgs();
         if (f instanceof Equals) {
-            //TODO wende Kapitel 4 an
             return eval(args.get(0), context).equals(eval(args.get(1), context));
         }
         else if (f instanceof And) {
@@ -115,16 +103,13 @@ public class ImprovedEvaluator implements Evaluator {
             for (Expr x : args) {
                 args2.add(eval(x, context));
             }
-            Object ase = context.getStructure().interpretConstant(((CFunc) f).getName(), args2.toArray());
-            return ase;
+           return context.getStructure().interpretConstant(((CFunc) f).getName(), args2.toArray());
         }
         else if (f instanceof Construct) {
             List<Object> args2 = new ArrayList<>();
             for (Expr x : args) {
-                // TODO pair[User1,User2] usw. ist nicht gewollt
                 args2.add(eval(x, context));
             }
-            //System.out.println(new DatatypeValue((((Construct) f).getDatatypeName()), args2).toString());
             return new DatatypeValue((((Construct) f).getDatatypeName()), args2);
         }
         else {
@@ -160,8 +145,7 @@ public class ImprovedEvaluator implements Evaluator {
 
             }
         }
-        Boolean b = (Boolean)eval(q.getBody(), newContext);
-        return b;
+        return (Boolean)eval(q.getBody(), newContext);
     }
 
     private Object evalVarUse(VarUse vu, Context context){
@@ -257,9 +241,8 @@ public class ImprovedEvaluator implements Evaluator {
     private Context copy(Context context, Structure structure) {
         Context newContext = new Context(structure, new HashMap<>());
         for (String s : context.getLocalVars().keySet()) {
-            String s1 = s;
             Object o1 = context.getLocalVars().get(s);
-            newContext.getLocalVars().put(s1,o1);
+            newContext.getLocalVars().put(s,o1);
         }
         return newContext;
     }
@@ -373,8 +356,8 @@ public class ImprovedEvaluator implements Evaluator {
     private Expr checkEqualityExists(Expr expr, Expr equality){
         Expr left = ((App) equality).getArgs().get(0);
         Expr right = ((App) equality).getArgs().get(1);
-        ExprBooleanVisitorClassExists exprVisitorLeft = new ExprBooleanVisitorClassExists(varUseListMap, variableNames);
-        ExprBooleanVisitorClassExists exprVisitorRight = new ExprBooleanVisitorClassExists(varUseListMap, variableNames);
+        ExprBooleanVisitorClassExists exprVisitorLeft = new ExprBooleanVisitorClassExists( variableNames);
+        ExprBooleanVisitorClassExists exprVisitorRight = new ExprBooleanVisitorClassExists( variableNames);
         boolean leftViable;
         boolean rightViable;
         leftViable = left.acceptEquality(exprVisitorLeft);
@@ -453,10 +436,7 @@ public class ImprovedEvaluator implements Evaluator {
         else{
              lastExistsQuantifier = findLastForallQuantifier(first);
         }
-        if(lastExistsQuantifier >= firstQuantifier){
-            return false;
-        }
-        return true;
+        return lastExistsQuantifier < firstQuantifier;
     }
     private int findFirstQuantifier(List<VarUse> varUses){
         int result = Integer.MAX_VALUE;
@@ -555,12 +535,10 @@ public class ImprovedEvaluator implements Evaluator {
     private void fillContainsMap(Expr expr, HashMap<String,ContainsExprInfo> containsExpr, Map<App,List<HashSet<Expr>>> equalsMap,  Map<Variable, Quantifier> variables,HashMap<Expr,HashSet<Expr>> predicateToClause, HashMap<ContainsExprInfo,HashSet<Expr>> containsToClause, HashSet<Expr> clauses, Expr clause, boolean not) {
         if (expr instanceof VarUse) {
 
-            // wenn wir in einer klausel sind, füge das als predikate hinzu mit predikate zu klausel
-            // gette, das zuerst, wenn null, dann egal, sonst füge dem Set die klausel hinzu
             if (clause == null){
                 clause = expr;
             }
-            if (clause != null) {
+
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
                     if (not){
@@ -576,7 +554,6 @@ public class ImprovedEvaluator implements Evaluator {
                     else e.add(clause);
                 }
                 predicateToClause.put(expr, e);
-                // Speichere in einer Map wo die VarUse vorkommen für die Gleichheitsverbesserung
                 if (varUseListMap.get(expr) == null){
                      ArrayList<HashSet<Expr>> a = new ArrayList<>();
                      a.add(e);
@@ -584,16 +561,12 @@ public class ImprovedEvaluator implements Evaluator {
                 }else{
                     varUseListMap.get(expr).add(e);
                 }
-            }
-            else{
-                System.out.println("Fall dürfte nicht vorkommen in CNF");
-            }
         }
         else if (expr instanceof Undef) {
             if (clause == null){
                 clause = expr;
             }
-            if (clause != null) {
+
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
                     if (not){
@@ -609,16 +582,11 @@ public class ImprovedEvaluator implements Evaluator {
                     else e.add(clause);
                 }
                 predicateToClause.put(expr, e);
-            }
-            else{
-                System.out.println("Fall dürfte nicht vorkommen in CNF");
-            }
         }
         else if (expr instanceof ConstantValue) {
             if (clause == null){
                 clause = expr;
             }
-            if (clause != null) {
                 HashSet<Expr> e = predicateToClause.get(expr);
                 if (e!= null) {
                     if (not){
@@ -634,10 +602,6 @@ public class ImprovedEvaluator implements Evaluator {
                     else e.add(clause);
                 }
                 predicateToClause.put(expr, e);
-            }
-            else{
-                System.out.println("Fall dürfte nicht vorkommen in CNF");
-            }
         }
         else if (expr instanceof QuantifierExpr) {
             variables.put(((QuantifierExpr) expr).getVariable(), ((QuantifierExpr) expr).getQuantifier());
@@ -759,17 +723,15 @@ public class ImprovedEvaluator implements Evaluator {
                         List<HashSet<Expr>> a = new ArrayList<>();
                         a.add(e);
                         equalsMap.put((App)expr,a);
-                        if (not){
+                    } else equalsMap.get(expr).add(e);
+                    if (not){
+                        if(negatedEqualities.get(expr) == null){
                             List<HashSet<Expr>> b = new ArrayList<>();
                             b.add(e);
                             negatedEqualities.put(expr,b);
                         }
-                    }
-                    else{
-                        equalsMap.get(expr).add(e);
-                        if (not){
-                            negatedEqualities.get(expr).add(e);
-                        }
+                        else negatedEqualities.get(expr).add(e);
+
                     }
                 }
 
@@ -777,36 +739,32 @@ public class ImprovedEvaluator implements Evaluator {
                     fillContainsMap(expr1, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
                 }
             }
-            else if (((App) expr).getFunc() instanceof And) {
-                // wenn einer der argument ein and function ist, dann ist es keine clausel..
-                // vielleicht vorher checken?? ja, wenn einer der beiden keine and ist, dann muss es eine klausel sein
-                //und alles da drin ist dann eine klausel!!
-                for (Expr e : ((App) expr).getArgs()) {
-                    if (e instanceof App) {
-                        if (!(((App) e).getFunc() instanceof And)) {
-                            clause = e;
-                            clauses.add(clause);
-                        }
-                    }
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
-                }
-            }
-            else if (((App) expr).getFunc() instanceof Or) {
-                for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
-                }
-            }
-            else if (((App) expr).getFunc() instanceof Not) {
-                for (Expr e : ((App) expr).getArgs()) {
-                    fillContainsMap(e, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,true);
-                }
-            }
+            if (expr instanceof App) {
+                 if (((App) expr).getFunc() instanceof And) {
 
-            else {
                     for (Expr e : ((App) expr).getArgs()) {
-                        fillContainsMap(e, containsExpr,equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
+                        if (e instanceof App) {
+                            if (!(((App) e).getFunc() instanceof And)) {
+                                clause = e;
+                                clauses.add(clause);
+                            }
+                        }
+                        fillContainsMap(e, containsExpr, equalsMap, variables, predicateToClause, containsToClause, clauses, clause, not);
+                    }
+                } else if (((App) expr).getFunc() instanceof Or) {
+                    for (Expr e : ((App) expr).getArgs()) {
+                        fillContainsMap(e, containsExpr, equalsMap, variables, predicateToClause, containsToClause, clauses, clause, not);
+                    }
+                } else if (((App) expr).getFunc() instanceof Not) {
+                    for (Expr e : ((App) expr).getArgs()) {
+                        fillContainsMap(e, containsExpr, equalsMap, variables, predicateToClause, containsToClause, clauses, clause, true);
+                    }
+                } else {
+                    for (Expr e : ((App) expr).getArgs()) {
+                        fillContainsMap(e, containsExpr, equalsMap, variables, predicateToClause, containsToClause, clauses, clause, not);
                     }
                 }
+            }
         }
     }
 

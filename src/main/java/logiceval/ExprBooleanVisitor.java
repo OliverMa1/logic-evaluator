@@ -1,8 +1,5 @@
 package logiceval;
 
-/**
- * Created by Oliver on 10.04.2018.
- */
 interface ExprBooleanVisitor {
     boolean visit(QuantifierExpr quantifierExpr);
     boolean visit(VarUse varUse);

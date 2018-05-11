@@ -1,13 +1,10 @@
 package logiceval;
 
 import static logiceval.JavaDsl.list;
-import static logiceval.JavaDsl.not;
 import static logiceval.JavaDsl.or;
-/**
- * Created by Oliver on 18.03.2018.
- */
+
 public class FuncVisitorDistLaw extends FuncVisitorClass {
-    ExprVisitorDistLaw exprVisitor;
+    private ExprVisitorDistLaw exprVisitor;
     public FuncVisitorDistLaw(App app, ExprVisitorDistLaw exprVisitor) {
         super(app,exprVisitor);
         this.exprVisitor = exprVisitor;

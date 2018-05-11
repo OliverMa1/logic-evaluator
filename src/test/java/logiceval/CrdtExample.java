@@ -1,18 +1,15 @@
 package logiceval;
 
-import junit.extensions.RepeatedTest;
-import logiceval.AbstractSyntax.*;
-import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-//import scala.collection.immutable.Set;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static logiceval.JavaDsl.*;
 import static org.junit.Assert.assertEquals;
+
+//import scala.collection.immutable.Set;
 
 
 /**
@@ -299,7 +296,7 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
         Expr expr = and(new ConstantValue(false),new ConstantValue(false));
-        for (int i = 0; i<10;i++){
+        for (int i = 0; i<5;i++){
             expr = or(expr,and(new ConstantValue(false),new ConstantValue(false)));
         }
         //expr = new QuantifierExpr(new Exists(),var("c1",t_callId),expr);
@@ -417,7 +414,7 @@ public class CrdtExample {
                     case "user":
                         return user;
                 }
-                throw new RuntimeException("TODO implement " + f);
+                throw new RuntimeException("unknown constant " + f);
             }
 
         };

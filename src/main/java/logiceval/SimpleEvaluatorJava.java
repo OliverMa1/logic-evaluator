@@ -1,17 +1,9 @@
 package logiceval;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-/**
- * Created by Oliver on 21.11.2017.
- */
-// TODO
+
+
 public class SimpleEvaluatorJava implements Evaluator {
     @Override
     public Object eval(Expr expr, Structure structure) {
@@ -85,10 +77,8 @@ public class SimpleEvaluatorJava implements Evaluator {
         else if (f instanceof Construct) {
             List<Object> args2 = new ArrayList<>();
             for (Expr x : args) {
-                // TODO pair[User1,User2] usw. ist nicht gewollt
                 args2.add(eval(x, context));
             }
-           // System.out.println(new DatatypeValue((((Construct) f).getDatatypeName()), args2).toString());
             return new DatatypeValue((((Construct) f).getDatatypeName()), args2);
         }
         else {
@@ -131,21 +121,9 @@ public class SimpleEvaluatorJava implements Evaluator {
         Context newContext = new Context(structure, new HashMap<>());
         for (String s : context.getLocalVars().keySet()) {
             String s1 = s;
-            // TODO deep or shallow
             Object o1 = context.getLocalVars().get(s);
             newContext.getLocalVars().put(s1,o1);
-           /* try {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(context.getLocalVars().get(s));
-                oos.flush();
-                oos.close();
-                bos.close();
-                byte[] byteData = bos.toByteArray();
-                ByteArrayInputStream bais = new ByteArrayInputStream(byteData);
-                Object o1 = (Object) new ObjectInputStream(bais).readObject();
-                newContext.getLocalVars().put(s1,o1);
-            } catch (Exception e) { e.printStackTrace();}*/
+
         }
         return newContext;
     }

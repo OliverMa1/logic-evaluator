@@ -1,8 +1,8 @@
 package logiceval;
 
 public class FuncVisitorClass implements FuncVisitor {
-    public App app;
-    public ExprVisitor exprVisitor;
+    App app;
+    ExprVisitor exprVisitor;
     public FuncVisitorClass(App app, ExprVisitor exprVisitor){
         this.app = app;
         this.exprVisitor = exprVisitor;

@@ -6,15 +6,11 @@ import java.util.List;
 import java.util.Set;
 
 
-/**
- * Created by Oliver on 21.11.2017.
- */
-// TODO : eventuell aufteilen in mehrere Dateien und ein Package, printer implementieren, javaDocs
 public class AbstractSyntax {
 
 }
 class ExprWrapper {
-    Expr expr;
+    private Expr expr;
 
     public void setExpr(Expr expr) {
         this.expr = expr;
@@ -412,11 +408,10 @@ class DatatypeValue extends Value {
         return values;
     }
     public String toString() {
-        String ausgabe = name +", ";
-        //String ausgabe = "";
+        StringBuilder ausgabe = new StringBuilder(name + ", ");
         Iterator<?> iterator = values.iterator();
         while(iterator.hasNext()){
-            ausgabe += iterator.next().toString() +", ";
+            ausgabe.append(iterator.next().toString()).append(", ");
         }
         if (ausgabe.length() <= 1) {
             return name;
@@ -428,10 +423,7 @@ class DatatypeValue extends Value {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DatatypeValue)) return false;
-        //if (!super.equals(o)) return false;
-
         DatatypeValue that = (DatatypeValue) o;
-        //System.out.println(name +  values + ((DatatypeValue) o).name + ((DatatypeValue) o).values);
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return values != null ? values.equals(that.values) : that.values == null;
     }
@@ -444,10 +436,6 @@ class DatatypeValue extends Value {
         return result;
     }
 
-   /* @Override
-    public boolean equals(Object o) {
-        return this.toString().equals(o.toString());
-    }*/
 
 
 }

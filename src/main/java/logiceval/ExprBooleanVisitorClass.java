@@ -5,13 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Oliver on 13.04.2018.
- */
+
 public class ExprBooleanVisitorClass implements ExprBooleanVisitor{
     private List<VarUse> varUses;
     private Map<VarUse,List <HashSet<Expr>>> varUseListMap;
-    Map<String, Quantifier> variables;
+    private Map<String, Quantifier> variables;
     public ExprBooleanVisitorClass(Map<VarUse,List <HashSet<Expr>>> varUseListMap, Map<String, Quantifier> variables){
         this.varUses = new ArrayList<>();
         this.varUseListMap = varUseListMap;

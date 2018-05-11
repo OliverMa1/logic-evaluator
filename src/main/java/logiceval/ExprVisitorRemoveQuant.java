@@ -1,11 +1,9 @@
 package logiceval;
 
-/**
- * Created by Oliver on 11.04.2018.
- */
+
 public class ExprVisitorRemoveQuant implements ExprVisitor{
-        Expr expr;
-        ExprWrapper originalExpr;
+    private Expr expr;
+    private ExprWrapper originalExpr;
         public ExprVisitorRemoveQuant(Expr expr, ExprWrapper originalExpr){
             this.expr = expr;
             this.originalExpr = originalExpr;

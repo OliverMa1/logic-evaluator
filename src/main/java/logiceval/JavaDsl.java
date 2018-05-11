@@ -83,8 +83,7 @@ public class JavaDsl {
     }
     @SafeVarargs
     public static <T> List<T> list(T... ts) {
-        java.util.List<T> list = Arrays.asList(ts);
-        return (list);
+        return (Arrays.asList(ts));
     }
 /*
     public static <T> List<T> list(java.util.List<T> list) {

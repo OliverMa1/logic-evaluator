@@ -1,6 +1,5 @@
 package logiceval;
 
-import logiceval.AbstractSyntax.*;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -9,9 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-//import scala.collection.immutable.Map;
 import static logiceval.JavaDsl.*;
 import static org.junit.Assert.assertEquals;
+
+//import scala.collection.immutable.Map;
 
 
 /**
@@ -100,7 +100,7 @@ public class MapExample {
                 } else if (f.equals("m")) {
                     return m;
                 }
-                throw new RuntimeException("TODO implement " + f);
+                throw new RuntimeException("unknown constant " + f);
             }
 
         };

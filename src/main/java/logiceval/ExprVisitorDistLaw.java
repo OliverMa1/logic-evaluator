@@ -1,8 +1,6 @@
 package logiceval;
 
-/**
- * Created by Oliver on 24.04.2018.
- */
+
 public class ExprVisitorDistLaw implements ExprVisitor {
     public boolean isFlag() {
         return flag;
