@@ -29,6 +29,9 @@ public class ImprovedEvaluator implements Evaluator {
     private Map<Expr, Expr> varUseToEqualityMap = new HashMap<>();
     // Speichere die Auswertung einer GleichheitsSeite zu dem Datenwert
     private Map<Expr, Object> dataValueToOneSide = new HashMap<>();
+    private Map<ContainsExprInfo, Expr> containsInfoToContains = new HashMap();
+    HashSet<Expr> clauses = new HashSet<>();
+
     Structure structure;
 
     @Override
@@ -252,7 +255,6 @@ public class ImprovedEvaluator implements Evaluator {
         HashMap<String,ContainsExprInfo> containsExpr = new HashMap<>();
         Map<App,List <HashSet<Expr>>> equalsMap = new HashMap<>();
         HashMap<ContainsExprInfo,HashSet<Expr>> containsToClause = new HashMap<>();
-        HashSet<Expr> clauses = new HashSet<>();
 
         Expr preProcExpr = expr;
         while (preProcExpr instanceof QuantifierExpr) {
@@ -282,9 +284,10 @@ public class ImprovedEvaluator implements Evaluator {
         for (ContainsExprInfo e : containsToClause.keySet()){
             String varUse = e.getVarName();
             if (variable.getName().equals(varUse)){
-                if (containsToClause.get(e).size() == 1) {
+                if (containsToClause.get(e).size() == 1 && clauses.contains(containsInfoToContains.get(e)) && !e.isNot()) {
                     String setName = e.getSetName();
                     Object o = structure.interpretConstant(setName,null );
+                    System.out.println(o);
                     if (o instanceof Set<?>){
                         SetTypeIterable setTypeIterable =
                                 new SetTypeIterable((Set<?>) o,(setName));
@@ -295,6 +298,7 @@ public class ImprovedEvaluator implements Evaluator {
         }
     }
     private void doUniversalCheck(Variable variable,HashSet<Expr> clauses, HashMap<ContainsExprInfo,HashSet<Expr>> containsToClause, HashMap<String,ContainsExprInfo> containsExpr ){
+
         if (variables.get(variable) instanceof Forall) {
             ContainsExprInfo e = containsExpr.get(variable.getName());
             if (e != null) {
@@ -611,12 +615,14 @@ public class ImprovedEvaluator implements Evaluator {
         else if (expr instanceof App) {
             if (((App) expr).getFunc() instanceof Contains) {
                 if (not) {
-
+                    containsInfoToContains.put(new ContainsExprInfo(((App)expr).getArgs().get(0).toString(),((App)expr).getArgs().get(1).toString(),true),not(expr));
                     containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), new ContainsExprInfo(((App)expr).getArgs().get(0).toString(),((App)expr).getArgs().get(1).toString(),true));
                 }
                 else {
-                    if (((App) expr).getArgs().get(0) instanceof VarUse)
-                    containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), new ContainsExprInfo(((App)expr).getArgs().get(0).toString(),((App)expr).getArgs().get(1).toString(),false));
+                    if (((App) expr).getArgs().get(0) instanceof VarUse) {
+                        containsInfoToContains.put(new ContainsExprInfo(((App)expr).getArgs().get(0).toString(),((App)expr).getArgs().get(1).toString(),false),(expr));
+                        containsExpr.put(((VarUse) ((App) expr).getArgs().get(0)).getName(), new ContainsExprInfo(((App) expr).getArgs().get(0).toString(), ((App) expr).getArgs().get(1).toString(), false));
+                    }
                 }
                 if (clause == null){
                     clause = expr;
@@ -735,9 +741,6 @@ public class ImprovedEvaluator implements Evaluator {
                     }
                 }
 
-                for (Expr expr1 : ((App) expr).getArgs()) {
-                    fillContainsMap(expr1, containsExpr, equalsMap,variables,predicateToClause,containsToClause,clauses,clause,not);
-                }
             }
             if (expr instanceof App) {
                  if (((App) expr).getFunc() instanceof And) {

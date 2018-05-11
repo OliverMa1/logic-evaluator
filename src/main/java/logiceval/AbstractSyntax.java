@@ -28,12 +28,12 @@ abstract class Expr {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return this.toString().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        return obj.equals(this.toString());
     }
 
     public String toString(){
@@ -76,6 +76,8 @@ class Variable {
 }
 
 class App extends Expr {
+
+
     private Func func;
     private List<Expr> args;
     public App(Func func, List<Expr> args) {
@@ -197,6 +199,16 @@ class Forall extends Quantifier {public String toString() {return "Forall";}}
 
 abstract class Func {
     public abstract void accept(final FuncVisitor visitor);
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }
 
 class Equals extends Func {
@@ -232,6 +244,16 @@ class Not extends Func {
 class Contains extends Func {
     public void accept(final FuncVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
 

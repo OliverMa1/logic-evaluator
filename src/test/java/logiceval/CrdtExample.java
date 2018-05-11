@@ -162,9 +162,7 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
-        Expr expr = mapExistsQuery();
-        //System.out.println("\n Print ende \n");
-        expr = forall(var("x", t_userId),
+        Expr expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
         long startTime = System.nanoTime();
@@ -172,12 +170,7 @@ public class CrdtExample {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
         System.out.println(duration);
-        /*for (Object o : structure.values(t_callInfo)) {
-            System.out.println(o.toString());
-        }
-        for (Object o : structure.values(t_UserPair)) {
-            System.out.println(o.toString());
-        }*/
+
         assertEquals(true, res);
 
     }
@@ -197,26 +190,18 @@ public class CrdtExample {
         String user = "User1";
         Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
 
-        Expr expr = mapExistsQuery();
-        expr = forall(var("x", t_userId),
+        Expr expr = forall(var("x", t_userId),
                 exists(var("p", t_UserPair),
                         eq(p, pair(x,x))));
-        //System.out.println(expr);
         long startTime = System.nanoTime();
         Object res = evaluatorImproved.eval(expr, structure);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
         System.out.println(duration);
-       /* for (Object o : structure.values(t_UserPair)) {
-            System.out.println(o.toString());
-        }
-        for (Object y : structure.values(t_userId)) {
-            System.out.println(pair(x,x));
-        }*/
-
         assertEquals(true, res);
 
     }
+
     @Test(timeout = 600000)
     public void test3Simple() {
         Set<Integer> visibleCalls = new HashSet<>();

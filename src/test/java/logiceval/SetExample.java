@@ -21,7 +21,7 @@ public class SetExample {
     private Evaluator evaluator = new ImprovedEvaluator();
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private CustomType t_int = type("int");
-    private DataType t_pair = dataType("pair", constructor("placeholder",t_int, t_int));
+    private DataType t_pair = dataType("pair", constructor("pair",t_int, t_int));
     private App setA = constantUse("setA");
     private App setB = constantUse("setB");
     private VarUse x = varuse("x");
@@ -29,7 +29,23 @@ public class SetExample {
     private VarUse p = varuse("p");
     private Func lt = func("lt");
 
+    @Test(timeout = 600000)
+    public void equalityForall() {
+        Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
+        Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
+        Structure structure = buildStructure(set1, set2);
 
+        Expr expr = forall(var("p", t_pair),
+                forall(var("x", t_int),forall(var("y", t_int),implies(
+                        eq(p, pair(x,y)), app(lt,x,y)))));
+        long startTime = System.nanoTime();
+        Object res = evaluator.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        assertEquals(false, res);
+
+    }
     @Test(timeout = 600000)
     public void test1() {
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
@@ -60,7 +76,7 @@ public class SetExample {
         // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
         Expr expr = exists(var("x", t_int),
                 exists(var("y", t_int),
-                        and(or((contains(x, setA)), new ConstantValue(false), app(lt,x,y)),
+                        and(or((not(contains(x, setA))), new ConstantValue(false), app(lt,x,y)),
                                 or(contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
                                 eq(x, y))));
 
