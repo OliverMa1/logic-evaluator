@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 public class CrdtExample {
-
+    private int scale = 10000;
     private Evaluator evaluatorSimple = new SimpleEvaluatorJava();
     private Evaluator evaluatorImproved = new ImprovedEvaluator();
     private CustomType t_String = type("string");
@@ -262,6 +262,119 @@ public class CrdtExample {
 
     }
     @Test(timeout = 600000)
+    public void moreRealistic() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        List<Object> callIds = IntStream.range(1, scale).<Object>mapToObj(x -> x).collect(Collectors.toList());
+        for (Object c : callIds){
+            int random = (int)(Math.random()*2);
+            if (random == 1){
+                visibleCalls.add((int)c);
+            }
+        }
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        for (Object c : callIds){
+            int random = (int)(Math.random()*2);
+            String s = "mapwrite";
+            if (random == 1 ){
+                s = "mapdelete";
+            }
+            String userRando = "user1";
+            random = (int)(Math.random()*2);
+            if (random == 1){
+                userRando = "user2";
+            }
+            if (s.equals("mapdelete")){
+                callOps.put((int)c,dataTypeValue("mapDelete", userRando));
+            }
+            else {
+                int randomInt = (int)(Math.random()*scale);
+                random = (int)(Math.random()*2);
+                if (random == 1) {
+                    callOps.put((int) c, dataTypeValue("mapWrite", userRando, dataTypeValue("F_name"), "String" + randomInt));
+                }
+                else {
+                    callOps.put((int) c, dataTypeValue("mapWrite", userRando, dataTypeValue("F_mail"), "String" + randomInt));
+
+                }
+            }
+        }
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+
+        /*        pairValue(2, 3),
+                pairValue(3, 1)
+        );*/
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
+        Object res = evaluatorSimple.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        assertEquals(false, res);
+
+    }
+    @Test(timeout = 600000)
+    public void moreRealisticImp() {
+        Set<Integer> visibleCalls = new HashSet<>();
+        List<Object> callIds = IntStream.range(1, scale).<Object>mapToObj(x -> x).collect(Collectors.toList());
+        for (Object c : callIds){
+            int random = (int)(Math.random()*2);
+            if (random == 1){
+                visibleCalls.add((int)c);
+            }
+        }
+        HashMap<Integer, DatatypeValue> callOps = new LinkedHashMap<>();
+        for (Object c : callIds){
+            int random = (int)(Math.random()*2);
+            String s = "mapwrite";
+            if (random == 1 ){
+                s = "mapdelete";
+            }
+            String userRando = "user1";
+            random = (int)(Math.random()*2);
+            if (random == 1){
+                userRando = "user2";
+            }
+            if (s.equals("mapdelete")){
+                callOps.put((int)c,dataTypeValue("mapDelete", userRando));
+            }
+            else {
+                int randomInt = (int)(Math.random()*scale);
+                random = (int)(Math.random()*2);
+                if (random == 1) {
+                    callOps.put((int) c, dataTypeValue("mapWrite", userRando, dataTypeValue("F_name"), "String" + randomInt));
+                }
+                else {
+                    callOps.put((int) c, dataTypeValue("mapWrite", userRando, dataTypeValue("F_mail"), "String" + randomInt));
+
+                }
+            }
+        }
+        Set<DatatypeValue> happensBefore = new HashSet<>();
+        happensBefore.add(pairValue(2,3));
+        happensBefore.add(pairValue(3,1));
+        /*        pairValue(2, 3),
+                pairValue(3, 1)
+        );*/
+        String user = "User1";
+        Structure structure = buildStructure(visibleCalls, callOps, happensBefore, user);
+
+        Expr expr = mapExistsQuery();
+        //System.out.println(expr);
+        long startTime = System.nanoTime();
+        Object res = evaluatorImproved.eval(expr, structure);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println(duration);
+        assertEquals(false, res);
+
+    }
+    @Test(timeout = 600000)
     public void dnfTest(){
         Expr c1 = varuse("c1");
         Expr c2 = varuse("c2");
@@ -370,9 +483,9 @@ public class CrdtExample {
     private Structure buildStructure(Set<Integer> visibleCalls, Map<Integer, DatatypeValue> callOps, Set<DatatypeValue> happensBefore, String user) {
         return new Structure() {
 
-            private List<Object> strings = IntStream.range(1, 1000).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
-            private List<Object> callIds = IntStream.range(1, 1000).<Object>mapToObj(x -> x).collect(Collectors.toList());
-            private List<Object> users = IntStream.range(1, 1000).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
+            private List<Object> strings = IntStream.range(1, scale).<Object>mapToObj(x -> "String" + x).collect(Collectors.toList());
+            private List<Object> callIds = IntStream.range(1, scale).<Object>mapToObj(x -> x).collect(Collectors.toList());
+            private List<Object> users = IntStream.range(1, scale).<Object>mapToObj(x -> "User" + x).collect(Collectors.toList());
 
             @Override
             public List<Object> valuesForCustomType(CustomType typ) {

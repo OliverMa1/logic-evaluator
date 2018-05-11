@@ -48,6 +48,7 @@ public class SetExample {
     }
     @Test(timeout = 600000)
     public void test1() {
+
         Set<Integer> set1 = new HashSet<Integer>(Arrays.asList(1, 5, 18, 32, 77, 99));
         Set<Integer> set2 = new HashSet<Integer>(Arrays.asList(4, 7, 22, 23, 32, 88));
         Structure structure = buildStructure(set1, set2);
@@ -76,7 +77,7 @@ public class SetExample {
         // (∃x: int. (∃y: int. (((((x ∈ setA) ∨ false) ∨ (lt(x, y))) ∧ ((y ∈ setB) ∨ (y = 2))) ∧ (x = y))))
         Expr expr = exists(var("x", t_int),
                 exists(var("y", t_int),
-                        and(or((not(contains(x, setA))), new ConstantValue(false), app(lt,x,y)),
+                        and(or(((contains(x, setA))), new ConstantValue(false), app(lt,x,y)),
                                 or(contains(y, setB),eq(y,new ConstantValue(2))),(not(contains(x,setA))),
                                 eq(x, y))));
 

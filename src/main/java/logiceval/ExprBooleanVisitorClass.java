@@ -54,14 +54,13 @@ public class ExprBooleanVisitorClass implements ExprBooleanVisitor{
                 return false;
             }
             for (int i = 0; i < args.size(); i++){
-                // erstes arg ist Name vom Konstruktor
-                if (i != 0){
+
                     res &= args.get(i).acceptEquality(this);
-                }
+
             }
             return res;
         }
-        return false;
+        return app.getFunc() instanceof CFunc;
     }
     public List<VarUse> getVarUses(){
         return varUses;

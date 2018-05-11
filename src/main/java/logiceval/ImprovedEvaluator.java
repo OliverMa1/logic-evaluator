@@ -38,12 +38,10 @@ public class ImprovedEvaluator implements Evaluator {
     public Object eval(Expr expr, Structure structure) {
         this.structure = structure;
         final Context context = new Context(structure, new HashMap<>());
-        //expr = preProcessing(expr, structure);
         expr = CNFTransformer.transform(expr);
         preProcessing(expr, structure);
-        //preProcessing(expr, structure);
-        System.out.println("Nach preProcessing: " + expr);
-        System.out.println("Verbesserte Gleichheiten: " + improvedEqualities +" Wegbeschreibung: " + varUseDirections);
+        /*System.out.println("Nach preProcessing: " + expr);
+        System.out.println("Verbesserte Gleichheiten: " + improvedEqualities +" Wegbeschreibung: " + varUseDirections);*/
         return eval(expr, context);
     }
     private Object eval(Expr expr, Context context) {
@@ -141,7 +139,6 @@ public class ImprovedEvaluator implements Evaluator {
         Context newContext = copy(context, context.getStructure());
         newContext.getLocalVars().put(v.getName(),varValue);
         if (!(q.getBody() instanceof QuantifierExpr)){
-            //System.out.println("Imporved eqlasok:" +improvedEqualities);
             dataValueToOneSide = new HashMap<>();
             for (Expr expr1 : improvedEqualities.keySet()) {
                 dataValueToOneSide.put( improvedEqualities.get(expr1),eval(expr1, newContext));
@@ -154,17 +151,14 @@ public class ImprovedEvaluator implements Evaluator {
     private Object evalVarUse(VarUse vu, Context context){
         if (varUseDirections.get(vu) == null) {
             Object a = context.getLocalVars().get(vu.getName());
-            //System.out.println(context.getLocalVars() + " " + vu.getName());
             if (a == (null)) {
-                throw new RuntimeException("Variable ${vu.name} not found.");
+                throw new RuntimeException("Variable " + vu.getName() +" not found.");
             } else return a;
         }
         else {
             Expr equality = varUseToEqualityMap.get(vu);
             Object evaluation = dataValueToOneSide.get(equality);
             List<Object> direction = varUseDirections.get(vu);
-            /*Type typ = namesToVariables.get(vu.getName()).getType();
-            System.out.println(context.getStructure().values(typ));*/
             Object result = evaluation;
             if (evaluation instanceof DatatypeValue){
                 for (int i = 0; i < direction.size(); i++){
@@ -287,7 +281,6 @@ public class ImprovedEvaluator implements Evaluator {
                 if (containsToClause.get(e).size() == 1 && clauses.contains(containsInfoToContains.get(e)) && !e.isNot()) {
                     String setName = e.getSetName();
                     Object o = structure.interpretConstant(setName,null );
-                    System.out.println(o);
                     if (o instanceof Set<?>){
                         SetTypeIterable setTypeIterable =
                                 new SetTypeIterable((Set<?>) o,(setName));
@@ -563,6 +556,7 @@ public class ImprovedEvaluator implements Evaluator {
                      a.add(e);
                     varUseListMap.put((VarUse)expr,a);
                 }else{
+                    if (!varUseListMap.get(expr).contains(e))
                     varUseListMap.get(expr).add(e);
                 }
         }
@@ -736,7 +730,10 @@ public class ImprovedEvaluator implements Evaluator {
                             b.add(e);
                             negatedEqualities.put(expr,b);
                         }
-                        else negatedEqualities.get(expr).add(e);
+                        else {
+                            if (!negatedEqualities.get(expr).contains(e))
+                            negatedEqualities.get(expr).add(e);
+                        }
 
                     }
                 }
